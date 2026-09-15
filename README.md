@@ -61,7 +61,7 @@ lib/
    ``n   cd artifacts/codeguard-ai
    pnpm run dev
    ``n
-6. Open http://localhost:5000
+6. Open `http://localhost:5000`
 
 ## How the report engine works
 
@@ -73,4 +73,5 @@ lib/
 ## License
 
 MIT
+
 
