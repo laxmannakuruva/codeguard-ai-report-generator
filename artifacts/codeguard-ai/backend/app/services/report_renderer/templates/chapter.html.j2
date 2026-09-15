@@ -1,0 +1,12 @@
+﻿{% for ch in ctx.chapters %}
+<section class="page chapter" id="anchor-chapter-{{ loop.index }}">
+  <h1 class="chapter-title">{{ ch.heading }}</h1>
+
+  {% if ch.paragraphs %}
+    {% for para in ch.paragraphs %}
+      <p>{{ para }}</p>
+    {% endfor %}
+  {% endif %}
+</section>
+{% endfor %}
+

@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.vite/
+__pycache__/
+*.py[cod]
+.venv/
+backend/.pytest_cache/
+backend/uploads/
+backend/*.egg-info/
+.env
+.env.*
+!.env.example

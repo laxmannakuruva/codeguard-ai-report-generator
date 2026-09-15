@@ -1,0 +1,61 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# Build output
+dist/
+dist/public/
+build/
+.next/
+.nuxt/
+coverage/
+
+# Vite
+.vite/
+
+# Env files
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Test outputs
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Uploaded test files
+*.zip
+*.pdf
+*.docx
+
+# Ollama models
+.ollama/
+
+# Replit
+.replit.nix
+.cache/
+
+# Logs
+*.log
+logs/

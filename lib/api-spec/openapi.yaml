@@ -1,0 +1,378 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: CodeGuard AI project understanding API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: projects
+    description: Uploaded project analysis operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /health:
+    get:
+      operationId: getHealth
+      tags: [health]
+      summary: Get service health
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /upload:
+    post:
+      operationId: uploadProject
+      tags: [projects]
+      summary: Upload a project ZIP
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ProjectUpload"
+      responses:
+        "201":
+          description: Upload accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadResponse"
+        "400":
+          description: Invalid ZIP upload
+  /analyze/{project_id}:
+    post:
+      operationId: analyzeProject
+      tags: [projects]
+      summary: Analyze an uploaded project
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+      responses:
+        "200":
+          description: Project analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectProfile"
+        "404":
+          description: Project not found
+  /project/{project_id}:
+    get:
+      operationId: getProject
+      tags: [projects]
+      summary: Get a project profile
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+      responses:
+        "200":
+          description: Project profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectProfile"
+        "404":
+          description: Project not found
+  /project/{project_id}/report-guidance:
+    post:
+      operationId: saveReportGuidance
+      tags: [projects]
+      summary: Save report instructions for a project
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReportGuidanceInput"
+      responses:
+        "200":
+          description: Saved report guidance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReportGuidance"
+        "404":
+          description: Project not found
+  /project/{project_id}/sample-report:
+    post:
+      operationId: uploadSampleReport
+      tags: [projects]
+      summary: Upload a sample report for a project
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/SampleReportUpload"
+      responses:
+        "201":
+          description: Sample report accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SampleReport"
+        "400":
+          description: Invalid sample report
+        "404":
+          description: Project not found
+  /project/{project_id}/report-inputs:
+    get:
+      operationId: getReportInputs
+      tags: [projects]
+      summary: Get report guidance and sample report metadata
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+      responses:
+        "200":
+          description: Current report inputs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReportInputs"
+        "404":
+          description: Project not found
+  /project/{project_id}/report:
+    post:
+      operationId: generateReport
+      tags: [projects]
+      summary: Generate the AI project report
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+      responses:
+        "200":
+          description: Generated report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectReport"
+        "404":
+          description: Project not found
+        "409":
+          description: Project analysis has not been run yet
+        "503":
+          description: Report generation is not configured
+    get:
+      operationId: getReport
+      tags: [projects]
+      summary: Get the current generated report
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+      responses:
+        "200":
+          description: Current report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectReport"
+        "404":
+          description: Project not found
+  /project/{project_id}/report/sections/{section_id}/regenerate:
+    post:
+      operationId: regenerateReportSection
+      tags: [projects]
+      summary: Regenerate a single report section
+      parameters:
+        - $ref: "#/components/parameters/ProjectId"
+        - name: section_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegenerateSectionInput"
+      responses:
+        "200":
+          description: Regenerated section
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReportSection"
+        "404":
+          description: Section not found
+        "409":
+          description: Report has not been generated yet
+        "503":
+          description: Report generation is not configured
+components:
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      schema:
+        type: string
+  schemas:
+    ProjectUpload:
+      type: object
+      required: [file]
+      properties:
+        file:
+          type: string
+          format: binary
+    UploadResponse:
+      type: object
+      required: [project_id, filename, size_bytes, status]
+      properties:
+        project_id:
+          type: string
+        filename:
+          type: string
+        size_bytes:
+          type: integer
+        status:
+          type: string
+    ReportGuidanceInput:
+      type: object
+      required: [instructions]
+      properties:
+        instructions:
+          type: string
+          minLength: 1
+          maxLength: 10000
+    ReportGuidance:
+      type: object
+      required: [project_id, instructions, status]
+      properties:
+        project_id: { type: string }
+        instructions: { type: string }
+        status: { type: string }
+    SampleReportUpload:
+      type: object
+      required: [file]
+      properties:
+        file:
+          type: string
+          format: binary
+    SampleReport:
+      type: object
+      required: [project_id, uploaded, filename, size_bytes, content_type, status, text_preview]
+      properties:
+        project_id: { type: string }
+        uploaded: { type: boolean }
+        filename: { type: string }
+        size_bytes: { type: integer }
+        content_type: { type: string }
+        status: { type: string }
+        text_preview: { type: string }
+    ReportInputs:
+      type: object
+      required: [project_id, guidance, sample_report]
+      properties:
+        project_id: { type: string }
+        guidance: { $ref: "#/components/schemas/ReportGuidance" }
+        sample_report: { $ref: "#/components/schemas/SampleReport" }
+    ReportSection:
+      type: object
+      required: [id, title, content, order]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        content: { type: string }
+        order: { type: integer }
+    ProjectReport:
+      type: object
+      required: [project_id, status, sections]
+      properties:
+        project_id: { type: string }
+        status: { type: string }
+        sections:
+          type: array
+          items: { $ref: "#/components/schemas/ReportSection" }
+    RegenerateSectionInput:
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+          maxLength: 20000
+    ProjectProfile:
+      type: object
+      required:
+        - project_id
+        - project_name
+        - project_type
+        - languages
+        - frameworks
+        - libraries
+        - frontend
+        - backend
+        - database
+        - apis
+        - modules
+        - features
+        - entry_points
+        - readme_summary
+        - folder_structure
+        - tests
+        - important_files
+      properties:
+        project_id: { type: string }
+        project_name: { type: string }
+        project_type: { type: string }
+        languages:
+          type: array
+          items: { type: string }
+        frameworks:
+          type: array
+          items: { type: string }
+        libraries:
+          type: array
+          items: { type: string }
+        frontend: { type: string }
+        backend: { type: string }
+        database: { type: string }
+        apis:
+          type: array
+          items: { type: string }
+        modules:
+          type: array
+          items: { type: string }
+        features:
+          type: array
+          items: { type: string }
+        entry_points:
+          type: array
+          items: { type: string }
+        readme_summary: { type: string }
+        folder_structure:
+          type: object
+          additionalProperties: true
+        tests:
+          type: array
+          items: { type: string }
+        important_files:
+          type: array
+          items: { type: string }
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+

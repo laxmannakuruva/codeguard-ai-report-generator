@@ -1,0 +1,24 @@
+﻿<section class="page cover">
+  <div class="cover-inner">
+    {% if ctx.logo_uri %}
+      <img class="logo-top" src="{{ ctx.logo_uri }}" alt="Institution logo">
+    {% endif %}
+
+    <div class="kicker">Internship / Project Report</div>
+    <div class="on">A REPORT</div>
+    <div class="on">ON</div>
+
+    <h1 class="project-title">{{ ctx.project_name }}</h1>
+
+    <div class="by">By</div>
+    <div class="student-line">Student name: <span class="not-detected">Not provided</span></div>
+    <div class="student-line">Roll number: <span class="not-detected">Not provided</span></div>
+
+    <p class="submission">
+      Submitted in partial fulfilment of the requirements of the internship programme.
+    </p>
+
+    <div class="date">Date: <span class="not-detected">Not provided</span></div>
+  </div>
+</section>
+

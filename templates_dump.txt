@@ -1,0 +1,134 @@
+﻿
+
+===== back_matter.html.j2 =====
+
+{# ACKNOWLEDGEMENT #}
+<section class="page front has-border" id="anchor-ack">
+  <h1>Acknowledgement</h1>
+  <div class="rule"></div>
+  {% if ctx.acknowledgement and ctx.acknowledgement.paragraphs %}
+    {% for p in ctx.acknowledgement.paragraphs %}
+      <p>{{ p }}</p>
+    {% endfor %}
+  {% else %}
+    <p class="notice">Acknowledgement content is not available.</p>
+  {% endif %}
+</section>
+
+
+===== base.html.j2 =====
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{ ctx.project_name }} â€” Project Report</title>
+<style>
+{{ css_vars }}
+
+{{ css_body }}
+</style>
+</head>
+<body>
+
+{% include "cover.html.j2" %}
+{% include "front_matter.html.j2" %}
+{% include "toc.html.j2" %}
+{% include "chapter.html.j2" %}
+{% include "back_matter.html.j2" %}
+
+</body>
+</html>
+
+
+===== chapter.html.j2 =====
+
+{% for ch in ctx.chapters %}
+<section class="page chapter has-border" id="anchor-chapter-{{ loop.index }}">
+  <h1 class="chapter-title">{{ ch.heading }}</h1>
+
+  {% if ch.paragraphs %}
+    {% for para in ch.paragraphs %}
+      <p>{{ para }}</p>
+    {% endfor %}
+  {% endif %}
+</section>
+{% endfor %}
+
+
+===== cover.html.j2 =====
+
+<section class="page cover has-border">
+  <div class="cover-inner">
+    {% if ctx.logo_uri %}
+      <img class="logo-top" src="{{ ctx.logo_uri }}" alt="Institution logo">
+    {% endif %}
+
+    <div class="kicker">Internship / Project Report</div>
+    <div class="on">A REPORT</div>
+    <div class="on">ON</div>
+
+    <h1 class="project-title">{{ ctx.project_name }}</h1>
+
+    <div class="by">By</div>
+    <div class="student-line">Student name: <span class="not-detected">Not provided</span></div>
+    <div class="student-line">Roll number: <span class="not-detected">Not provided</span></div>
+
+    <p class="submission">
+      Submitted in partial fulfilment of the requirements of the internship programme.
+    </p>
+
+    <div class="date">Date: <span class="not-detected">Not provided</span></div>
+  </div>
+</section>
+
+
+===== front_matter.html.j2 =====
+
+{# ACKNOWLEDGEMENT #}
+<section class="page front has-border" id="anchor-ack">
+  <h1>Acknowledgement</h1>
+  <div class="rule"></div>
+  {% if ctx.acknowledgement and ctx.acknowledgement.paragraphs %}
+    {% for p in ctx.acknowledgement.paragraphs %}
+      <p>{{ p }}</p>
+    {% endfor %}
+  {% else %}
+    <p class="notice">Acknowledgement content is not available.</p>
+  {% endif %}
+</section>
+
+
+===== toc.html.j2 =====
+
+<section class="page front has-border">
+  <h1>Table of Contents</h1>
+  <div class="rule"></div>
+
+  <ul class="toc-list">
+    <li>
+      <span class="toc-title">Acknowledgement</span>
+      <span class="toc-dots"></span>
+      <span class="toc-page" data-toc-anchor="anchor-ack">—</span>
+    </li>
+
+    {% for ch in ctx.chapters %}
+    <li>
+      <span class="toc-title">{{ ch.heading }}</span>
+      <span class="toc-dots"></span>
+      <span class="toc-page" data-toc-anchor="anchor-chapter-{{ loop.index }}">—</span>
+    </li>
+    {% endfor %}
+
+    <li>
+      <span class="toc-title">Appendices</span>
+      <span class="toc-dots"></span>
+      <span class="toc-page" data-toc-anchor="anchor-appendices">—</span>
+    </li>
+    <li>
+      <span class="toc-title">References</span>
+      <span class="toc-dots"></span>
+      <span class="toc-page" data-toc-anchor="anchor-references">—</span>
+    </li>
+  </ul>
+</section>

@@ -1,0 +1,864 @@
+BUILD A COMPLETELY NEW PROJECT FROM SCRATCH.
+
+PROJECT NAME:
+CodeGuard AI — AI-Powered Project Report Generator
+
+IMPORTANT:
+This is a completely NEW project.
+Do NOT use, copy, migrate, or reuse any previous CodeGuard AI project.
+Do NOT add the old bug-detection/security/fix functionality.
+
+==================================================
+1. PROJECT GOAL
+==================================================
+
+Build a professional full-stack web application for B.Tech, college, and internship students.
+
+The problem:
+Students spend many hours manually understanding their project and preparing project/internship reports.
+
+CodeGuard AI should allow a student to:
+
+1. Upload their actual project as a ZIP.
+2. Analyze and understand the project.
+3. Display an accurate project summary.
+4. Enter report requirements and student details.
+5. Optionally upload a sample report PDF/DOCX.
+6. Understand the sample report's structure.
+7. Generate a professional report using AI based on the ACTUAL uploaded project.
+8. Preview the generated report.
+9. Edit the report.
+10. Regenerate individual sections.
+11. Download the final report as PDF and DOCX.
+
+MAIN WORKFLOW:
+
+Project ZIP
+    ↓
+Project Analysis
+    ↓
+Project Understanding
+    ↓
+Project Summary
+    ↓
+Report Instructions
+    ↓
+Optional Sample Report
+    ↓
+Report Structure
+    ↓
+AI Report Generation
+    ↓
+Report Preview
+    ↓
+Edit / Regenerate
+    ↓
+PDF / DOCX Download
+
+==================================================
+2. TECH STACK
+==================================================
+
+Frontend:
+- React
+- Vite
+- Modern responsive UI
+
+Backend:
+- Python
+- FastAPI
+
+AI:
+- LLM API
+- API key must come from environment variables
+- Never hardcode API keys
+
+Document generation:
+- python-docx for DOCX
+- ReportLab for PDF
+
+Use clean modular architecture.
+
+==================================================
+3. PROJECT STRUCTURE
+==================================================
+
+CodeGuard-AI/
+│
+├── backend/
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── main.py
+│   │   │
+│   │   ├── routes/
+│   │   │   ├── upload.py
+│   │   │   ├── project.py
+│   │   │   ├── template.py
+│   │   │   ├── report.py
+│   │   │   └── export.py
+│   │   │
+│   │   ├── services/
+│   │   │   ├── zip_analyzer.py
+│   │   │   ├── project_profiler.py
+│   │   │   ├── code_extractor.py
+│   │   │   ├── template_parser.py
+│   │   │   ├── report_generator.py
+│   │   │   └── document_generator.py
+│   │   │
+│   │   ├── models/
+│   │   │   ├── project.py
+│   │   │   ├── template.py
+│   │   │   └── report.py
+│   │   │
+│   │   └── utils/
+│   │       ├── file_utils.py
+│   │       └── security.py
+│   │
+│   ├── requirements.txt
+│   └── Dockerfile
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── ZipUploader.jsx
+│   │   │   ├── AnalysisProgress.jsx
+│   │   │   ├── ProjectSummary.jsx
+│   │   │   ├── ReportInstructions.jsx
+│   │   │   ├── TemplateUploader.jsx
+│   │   │   ├── ReportSettings.jsx
+│   │   │   ├── ReportGenerator.jsx
+│   │   │   ├── ReportPreview.jsx
+│   │   │   └── DownloadButtons.jsx
+│   │   │
+│   │   ├── pages/
+│   │   │   ├── Home.jsx
+│   │   │   ├── Analyze.jsx
+│   │   │   └── Report.jsx
+│   │   │
+│   │   ├── services/
+│   │   │   └── api.js
+│   │   │
+│   │   ├── App.jsx
+│   │   ├── App.css
+│   │   ├── index.css
+│   │   └── main.jsx
+│   │
+│   ├── package.json
+│   └── vite.config.js
+│
+├── generated_reports/
+├── sample_reports/
+├── README.md
+├── .gitignore
+└── .env.example
+
+==================================================
+4. PROJECT ZIP ANALYSIS
+==================================================
+
+Accept only .ZIP project uploads.
+
+Support drag-and-drop and normal file selection.
+
+Show:
+- filename
+- file size
+- upload progress
+- analysis progress
+- errors
+
+Analyze the REAL uploaded project.
+
+Detect:
+
+- project name
+- project type
+- programming languages
+- frameworks
+- libraries
+- dependencies
+- frontend
+- backend
+- database
+- APIs
+- modules
+- features
+- entry points
+- README
+- tests
+- important files
+- folder structure
+
+Inspect actual project files such as:
+
+package.json
+requirements.txt
+pyproject.toml
+pom.xml
+build.gradle
+composer.json
+Cargo.toml
+go.mod
+README.md
+configuration files
+source-code files
+
+Do not guess technologies.
+
+==================================================
+5. STRICT ANTI-HALLUCINATION
+==================================================
+
+This is extremely important.
+
+AI must generate reports ONLY from evidence found in the uploaded project.
+
+Examples:
+
+No database detected:
+"Database: Not detected"
+
+No machine learning:
+Do NOT mention machine learning.
+
+No authentication:
+Do NOT claim authentication.
+
+No REST API:
+Do NOT claim REST API.
+
+No React:
+Do NOT claim React.
+
+If information cannot be verified:
+say "Not detected" or "Not specified".
+
+Never invent:
+- technologies
+- modules
+- features
+- datasets
+- algorithms
+- results
+- performance numbers
+- database systems
+- APIs
+- achievements
+
+==================================================
+6. SAFE ZIP HANDLING
+==================================================
+
+Never execute uploaded project code.
+
+Only inspect files.
+
+Protect against:
+- path traversal
+- absolute paths
+- symlinks
+- ZIP bombs
+- excessive file counts
+- oversized files
+- dangerous extraction paths
+
+Set sensible upload limits.
+
+==================================================
+7. PROJECT PROFILE
+==================================================
+
+Create a structured ProjectProfile:
+
+{
+ project_name,
+ project_type,
+ description,
+ languages,
+ frameworks,
+ libraries,
+ frontend,
+ backend,
+ database,
+ apis,
+ modules,
+ features,
+ entry_points,
+ readme_summary,
+ folder_structure,
+ tests,
+ important_files
+}
+
+==================================================
+8. REPORT INSTRUCTIONS
+==================================================
+
+After Project Summary, show a Report Instructions page.
+
+Allow:
+
+Report Type:
+- B.Tech Project Report
+- Internship Report
+- Mini Project Report
+- Technical Documentation
+- Custom Report
+
+Fields:
+
+- Student Name
+- Roll Number
+- College Name
+- Department
+- Guide Name
+- Academic Year
+- Desired Page Count
+- Custom Instructions
+
+==================================================
+9. SAMPLE REPORT UPLOAD
+==================================================
+
+Allow optional upload of:
+
+- PDF
+- DOCX
+
+Show:
+- filename
+- size
+- remove
+- replace
+
+Parse the sample report and extract:
+
+- title
+- headings
+- chapters
+- sections
+- hierarchy
+- ordering
+- basic structural information
+- references section
+- appendix structure
+
+IMPORTANT:
+
+The sample report is ONLY a structural/style reference.
+
+DO NOT copy its actual content.
+
+DO NOT copy its project name.
+
+DO NOT copy its technologies.
+
+DO NOT copy its paragraphs.
+
+Generate new content from the student's actual project.
+
+If no sample report is uploaded, use a professional default academic structure.
+
+==================================================
+10. DEFAULT REPORT STRUCTURE
+==================================================
+
+Use:
+
+Cover Page
+Certificate
+Declaration
+Acknowledgement
+Abstract
+Table of Contents
+
+1. Introduction
+2. Problem Statement
+3. Objectives
+4. Existing System
+5. Proposed System
+6. System Requirements
+7. System Architecture
+8. Project Workflow
+9. Technologies Used
+10. Module Description
+11. Implementation
+12. Testing
+13. Results
+14. Advantages
+15. Limitations
+16. Future Scope
+17. Conclusion
+18. References
+19. Appendix
+
+If the uploaded sample report has a different useful structure, use its structure instead.
+
+==================================================
+11. AI REPORT GENERATION
+==================================================
+
+Create an AI report generator.
+
+Input:
+
+ProjectProfile
++
+Report Instructions
++
+Student Details
++
+Sample Report Structure
+
+Generate a complete professional academic report.
+
+Writing style:
+- professional
+- academic
+- clear
+- simple English
+- suitable for B.Tech students
+- technically accurate
+
+Every technical statement must be grounded in ProjectProfile.
+
+Do not fabricate results.
+
+For sections requiring information not present in the project, clearly indicate that information is unavailable rather than inventing it.
+
+==================================================
+12. SMART SECTION GENERATION
+==================================================
+
+Generate each section separately.
+
+Example:
+
+Introduction
+Problem Statement
+Objectives
+Existing System
+Proposed System
+System Requirements
+Architecture
+Workflow
+Technologies
+Modules
+Implementation
+Testing
+Results
+Advantages
+Limitations
+Future Scope
+Conclusion
+References
+Appendix
+
+Store each section independently so the user can edit/regenerate it.
+
+==================================================
+13. REPORT PREVIEW
+==================================================
+
+Create a professional report editor.
+
+Display:
+- cover
+- table of contents
+- chapters
+- headings
+- paragraphs
+- lists
+- tables where appropriate
+
+Allow:
+
+- edit text
+- regenerate section
+- delete section
+- add section
+- reorder sections
+- restore generated version
+
+Add:
+
+"Regenerate This Section"
+
+The regeneration must still use the actual ProjectProfile as its source.
+
+==================================================
+14. REPORT GENERATION UI
+==================================================
+
+Show a professional progress screen:
+
+Analyzing Project
+✓
+
+Understanding Technologies
+✓
+
+Understanding Modules
+✓
+
+Reading Report Structure
+✓
+
+Preparing Report
+●
+
+Generating Sections
+○
+
+Finalizing Report
+○
+
+Do not use fake progress that claims completed work when it hasn't happened.
+
+==================================================
+15. PDF EXPORT
+==================================================
+
+Generate a professional academic PDF.
+
+Include:
+
+- cover page
+- certificate
+- declaration
+- acknowledgement
+- abstract
+- table of contents
+- chapters
+- headings
+- page numbers
+- references
+- appendix
+
+Use proper spacing and typography.
+
+==================================================
+16. DOCX EXPORT
+==================================================
+
+Generate a professional editable DOCX.
+
+Include:
+- title page
+- headings
+- paragraphs
+- tables
+- page numbers
+- references
+- appendix
+
+The DOCX must be editable in Microsoft Word.
+
+==================================================
+17. REPORT SETTINGS
+==================================================
+
+Before generation show a final confirmation page:
+
+PROJECT
+- project name
+- project type
+- technologies
+
+REPORT
+- report type
+- page count
+- sample structure
+
+STUDENT
+- student name
+- roll number
+- college
+- department
+- guide
+- academic year
+
+INSTRUCTIONS
+- custom instructions
+
+Buttons:
+
+Back
+Generate Report
+
+==================================================
+18. UI DESIGN
+==================================================
+
+Make this look like a professional AI product.
+
+Use a distinctive technical/blueprint visual identity:
+
+- deep blueprint-style background
+- professional typography
+- technical drafting details
+- subtle grid elements
+- clean cards
+- engineering-style borders
+- responsive design
+- polished buttons
+- progress indicators
+- modern upload interface
+
+Do NOT make it look like a basic college HTML project.
+
+The UI should be impressive enough for:
+- final-year project demonstration
+- resume
+- GitHub
+- internship presentation
+- interview discussion
+
+==================================================
+19. ERROR HANDLING
+==================================================
+
+Handle:
+
+- invalid ZIP
+- corrupted ZIP
+- oversized ZIP
+- empty project
+- unsupported sample file
+- corrupted PDF
+- corrupted DOCX
+- missing README
+- missing package files
+- project with unknown technology
+- AI API failure
+- report generation failure
+- PDF generation failure
+- DOCX generation failure
+
+Show useful human-readable messages.
+
+==================================================
+20. API ENDPOINTS
+==================================================
+
+Implement:
+
+GET /api/health
+
+POST /api/upload
+
+POST /api/analyze/{project_id}
+
+GET /api/project/{project_id}
+
+POST /api/template/upload
+
+GET /api/template/{template_id}
+
+POST /api/report/generate
+
+GET /api/report/{report_id}
+
+PUT /api/report/{report_id}
+
+POST /api/report/{report_id}/regenerate-section
+
+GET /api/report/{report_id}/download/pdf
+
+GET /api/report/{report_id}/download/docx
+
+==================================================
+21. ENVIRONMENT
+==================================================
+
+Create:
+
+.env.example
+
+Example:
+
+AI_API_KEY=
+AI_MODEL=
+VITE_API_URL=
+
+Never commit real API keys.
+
+==================================================
+22. README
+==================================================
+
+Create a complete README containing:
+
+- Project overview
+- Problem statement
+- Solution
+- Features
+- Architecture
+- Technology stack
+- Folder structure
+- Backend setup
+- Frontend setup
+- Environment variables
+- API documentation
+- How to use
+- Report generation workflow
+- Security considerations
+- Anti-hallucination approach
+- PDF/DOCX export
+- Future scope
+
+==================================================
+23. TESTING
+==================================================
+
+Test the complete workflow with a realistic sample project:
+
+ZIP
+→ upload
+→ analyze
+→ project profile
+→ project summary
+→ report instructions
+→ sample report upload
+→ template parsing
+→ report generation
+→ preview
+→ edit
+→ PDF
+→ DOCX
+
+Also test:
+
+- project with no database
+- project with no README
+- empty ZIP
+- invalid ZIP
+- malicious traversal ZIP
+- invalid sample file
+- PDF sample
+- DOCX sample
+- AI failure
+- missing AI API key
+
+Verify that the system never invents unsupported technologies.
+
+==================================================
+24. IMPORTANT IMPLEMENTATION RULE
+==================================================
+
+Do NOT create fake/demo project data just to make the dashboard look populated.
+
+Everything displayed about an uploaded project must come from the actual uploaded project.
+
+Do not create fake statistics.
+
+Do not create fake technologies.
+
+Do not create fake test results.
+
+==================================================
+25. DEPLOYMENT
+==================================================
+
+Make the application cloud-ready.
+
+Backend must run with:
+
+uvicorn app.main:app --host 0.0.0.0 --port $PORT
+
+Frontend must work with a configurable VITE_API_URL.
+
+Keep CORS configurable.
+
+==================================================
+26. FINAL VERIFICATION
+==================================================
+
+After implementation:
+
+1. Install dependencies.
+2. Start backend.
+3. Start frontend.
+4. Test all API endpoints.
+5. Test the complete UI workflow.
+6. Test real ZIP upload.
+7. Test sample PDF.
+8. Test sample DOCX.
+9. Test AI generation.
+10. Test report editing.
+11. Test PDF export.
+12. Test DOCX export.
+13. Fix all errors.
+14. Verify responsive UI.
+15. Verify no secrets are included.
+16. Verify README is complete.
+
+DO NOT leave placeholder buttons.
+
+Every visible feature should actually work.
+
+==================================================
+27. CLOUD HANDOFF RULE
+==================================================
+
+This project may be continued across multiple cloud accounts.
+
+When your usage/session limit is getting close:
+
+STOP DEVELOPMENT IMMEDIATELY.
+
+Do NOT waste remaining usage on unnecessary testing or explanations.
+
+Create a complete ZIP backup of the current working project.
+
+Name it:
+
+CodeGuard-AI-Complete-Milestone.zip
+
+Exclude:
+
+node_modules
+dist
+__pycache__
+.git
+.env
+API keys
+secrets
+temporary files
+cache files
+
+Include everything required to continue development in another cloud environment.
+
+Also create/update README with the exact current implementation status.
+
+When the ZIP is ready, clearly tell me:
+
+"Milestone ZIP is ready."
+
+Do not continue adding features after preparing the handoff ZIP.
+
+==================================================
+FINAL REQUIREMENT
+==================================================
+
+Build the entire application as a REAL WORKING PRODUCT.
+
+Do not just create mock screens.
+
+Do not stop after creating files.
+
+Do not use fake project information.
+
+Do not add the old CodeGuard bug/security system.
+
+The final product must be:
+
+UPLOAD PROJECT
+→ UNDERSTAND PROJECT
+→ CONFIGURE REPORT
+→ UPLOAD SAMPLE
+→ GENERATE AI REPORT
+→ PREVIEW/EDIT
+→ DOWNLOAD PDF/DOCX
+
+Start building now.

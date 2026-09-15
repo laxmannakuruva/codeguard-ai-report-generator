@@ -1,0 +1,36 @@
+kind = "web"
+previewPath = "/"
+title = "CodeGuard AI"
+description = "A full-stack project understanding workspace for B.Tech and college students. Upload a ZIP, inspect its real structure and technologies safely, and review a grounded project summary without invented claims."
+version = "1.0.0"
+id = "artifacts/codeguard-ai"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20466
+
+[services.development]
+run = "pnpm --filter @workspace/codeguard-ai run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/codeguard-ai", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/codeguard-ai/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20466"
+BASE_PATH = "/"
+
+[[services]]
+name = "api"
+paths = [ "/api" ]
+localPort = 20467
+
+[services.development]
+run = "uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT"

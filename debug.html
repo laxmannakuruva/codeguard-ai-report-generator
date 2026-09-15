@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CodeGuard AI — Project Report</title>
+<style>
+:root {
+  --page-w: 595.2000122070312pt;
+  --page-h: 841.9199829101562pt;
+  --m-top: 72.14238739013672pt;
+  --m-bottom: 88.2667236328125pt;
+  --m-left: 72.02400207519531pt;
+  --m-right: 71.57000732421875pt;
+  --font-serif: 'Times New Roman', Georgia, serif;
+  --font-sans: 'Helvetica Neue', Arial, sans-serif;
+  --size-body: 12.5pt;
+  --size-h1: 19.920000076293945pt;
+  --size-h2: 18.420000076293945pt;
+  --size-cap: 11.3pt;
+  --ink: #000000;
+  --accent: #0563c1;
+  --rule: #0563c1;
+  --border: #222222;
+  --border-inset: 24.0pt;
+  --border-width: 0.8pt;
+}
+
+﻿@page { size: var(--page-w) var(--page-h); margin: 0; }
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0; background: #fff; color: #000;
+  font-family: var(--font-serif); font-size: var(--size-body); line-height: 1.5;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+.page {
+  position: relative; width: var(--page-w); height: var(--page-h);
+  padding: var(--m-top) var(--m-right) var(--m-bottom) var(--m-left);
+  page-break-after: always; overflow: hidden;
+}
+.page:last-child { page-break-after: auto; }
+.page.has-border::before {
+  content: ""; position: absolute;
+  top: var(--border-inset); left: var(--border-inset);
+  right: var(--border-inset); bottom: var(--border-inset);
+  border: 0.8pt solid #000; pointer-events: none;
+}
+h1, h2, h3 { font-family: var(--font-serif); color: #000; margin: 0 0 0.55em 0;
+  page-break-after: avoid; break-after: avoid; }
+h1 { font-size: var(--size-h1); line-height: 1.22; }
+h2 { font-size: var(--size-h2); line-height: 1.28; margin-top: 1.05em; }
+p { margin: 0 0 0.65em 0; text-align: justify; orphans: 3; widows: 3; }
+ul, ol { margin: 0 0 0.8em 1.2em; padding: 0; }
+li { margin: 0.15em 0; }
+.center { text-align: center; }
+.notice { font-style: italic; color: #333; }
+.not-detected { font-style: italic; color: #333; }
+
+/* Cover */
+.cover { padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center; }
+.cover .cover-inner { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; padding: 12% 12% 6%; }
+.cover .logo-top { max-height: 70pt; max-width: 180pt; object-fit: contain; margin-bottom: 30pt; }
+.cover .kicker { font-family: var(--font-serif); font-size: 11pt; letter-spacing: 2pt; text-transform: uppercase; color: #000; margin-bottom: 12pt; }
+.cover .on { font-size: 12pt; letter-spacing: 1pt; margin: 6pt 0; color: #000; }
+.cover h1.project-title { font-size: calc(var(--size-h1) * 1.6); line-height: 1.2; margin: 14pt 0 20pt; max-width: 90%; color: #000; }
+.cover .by { font-size: 12pt; margin-top: 10pt; }
+.cover .student-line { font-size: 12pt; margin: 4pt 0; }
+.cover .submission { font-style: italic; font-size: 11pt; max-width: 78%; margin: 24pt auto 8pt; color: #333; }
+.cover .date { font-size: 11pt; margin-top: 18pt; }
+.cover .institution-block { width: 100%; padding: 8% 12% 8%; border-top: 2pt solid #000; }
+.cover .institution { font-size: 15pt; font-weight: 700; color: #000; }
+.cover .institution-sub { font-size: 11pt; color: #333; margin-top: 4pt; }
+
+/* Front matter */
+.front h1 { text-align: center; text-transform: uppercase; letter-spacing: 1.2pt; margin: 4pt 0 14pt; color: #000; }
+.front .rule { height: 1.4pt; background: #000; margin: 0 auto 18pt; width: 34%; }
+.front p { text-align: justify; }
+
+/* Tables — black borders */
+table.data { width: 100%; border-collapse: collapse; margin: 10pt 0 14pt; font-size: calc(var(--size-body) - 0.4pt); page-break-inside: avoid; }
+table.data th, table.data td { border: 1pt solid #000; padding: 6pt 8pt; text-align: left; vertical-align: top; }
+table.data th { background: #f0f0f0; font-weight: 700; color: #000; }
+table.joining { width: 100%; border-collapse: collapse; margin-top: 12pt; font-size: calc(var(--size-body) - 0.4pt); }
+table.joining th, table.joining td { border: 1pt solid #000; padding: 7pt 9pt; vertical-align: top; text-align: left; }
+table.joining th { background: #f0f0f0; font-weight: 700; width: 34%; }
+.summary-grid { display: grid; grid-template-columns: 32% 68%; border: 1pt solid #000; margin: 10pt 0 14pt; }
+.summary-grid > div { padding: 7pt 9pt; border-bottom: 1pt solid #000; }
+.summary-grid > div:nth-child(odd) { background: #f5f5f5; font-weight: 700; }
+
+/* TOC */
+.toc-list { list-style: none; padding: 0; margin: 8pt 0 0 0; }
+.toc-list li { display: flex; align-items: baseline; gap: 6pt; margin: 5pt 0; }
+.toc-list .toc-title { font-weight: 600; }
+.toc-list .toc-dots { flex: 1; border-bottom: 1pt dotted #333; transform: translateY(-2pt); }
+.toc-list .toc-page { font-variant-numeric: tabular-nums; min-width: 2ch; text-align: right; color: #000; font-weight: 700; }
+
+/* Chapters */
+.chapter .chapter-title { color: #000; border-bottom: 1.4pt solid #000; padding-bottom: 6pt; margin-bottom: 14pt; text-align: left; }
+.chapter h2 { color: #000; border-bottom: none; padding-left: 0; }
+
+/* Figures */
+figure.figure { margin: 14pt auto; text-align: center; page-break-inside: avoid; break-inside: avoid; }
+figure.figure img { max-width: 100%; max-height: 300pt; object-fit: contain; border: 1pt solid #000; padding: 4pt; background: #fff; }
+figure.figure figcaption { font-size: var(--size-cap); font-style: italic; margin-top: 5pt; color: #333; }
+
+/* Code / tree */
+pre.tree, pre.code { font-family: "Consolas", "Courier New", monospace; font-size: calc(var(--size-body) - 1pt); line-height: 1.38; background: #fafafa; border: 0.8pt solid #333; padding: 8pt 10pt; white-space: pre-wrap; word-break: break-word; page-break-inside: avoid; margin: 6pt 0 12pt; }
+
+</style>
+</head>
+<body>
+
+﻿<section class="page cover has-border">
+  <div class="cover-inner">
+
+    <div class="kicker">Internship / Project Report</div>
+    <div class="on">A REPORT</div>
+    <div class="on">ON</div>
+
+    <h1 class="project-title">CodeGuard AI</h1>
+
+    <div class="by">By</div>
+    <div class="student-line">Student name: <span class="not-detected">Not provided</span></div>
+    <div class="student-line">Roll number: <span class="not-detected">Not provided</span></div>
+
+    <p class="submission">
+      Submitted in partial fulfilment of the requirements of the internship programme.
+    </p>
+
+    <div class="date">Date: <span class="not-detected">Not provided</span></div>
+  </div>
+</section>﻿<section class="page front has-border" id="anchor-ack">
+  <h1>Acknowledgement</h1>
+  <div class="rule"></div>
+      <p>Test ack.</p>
+</section>﻿<section class="page front has-border">
+  <h1>Table of Contents</h1>
+  <div class="rule"></div>
+
+  <ul class="toc-list">
+    <li>
+      <span class="toc-title">Acknowledgement</span>
+      <span class="toc-dots"></span>
+      <span class="toc-page" data-toc-anchor="anchor-ack">—</span>
+    </li>
+    <li>
+      <span class="toc-title">Abstract</span>
+      <span class="toc-dots"></span>
+      <span class="toc-page" data-toc-anchor="anchor-chapter-1">—</span>
+    </li>
+
+      <li>
+        <span class="toc-title">2. Introduction</span>
+        <span class="toc-dots"></span>
+        <span class="toc-page" data-toc-anchor="anchor-chapter-2">—</span>
+      </li>
+
+    <li>
+      <span class="toc-title">Appendices</span>
+      <span class="toc-dots"></span>
+      <span class="toc-page" data-toc-anchor="anchor-appendices">—</span>
+    </li>
+    <li>
+      <span class="toc-title">References</span>
+      <span class="toc-dots"></span>
+      <span class="toc-page" data-toc-anchor="anchor-references">—</span>
+    </li>
+  </ul>
+</section>﻿<section class="page chapter has-border" id="anchor-chapter-1">
+  <div class="running-header">
+    <span>CodeGuard AI</span>
+  </div>
+
+  <h1 class="chapter-title">1. Abstract</h1>
+
+      <p>Test abstract paragraph.</p>
+
+    <h2>Detected project facts</h2>
+    <table class="data">
+      <thead><tr><th>Attribute</th><th>Detected value</th></tr></thead>
+      <tbody>
+        <tr><td>Project name</td><td>CodeGuard AI</td></tr>
+        <tr><td>Project type</td><td>Full-stack web application</td></tr>
+        <tr><td>Languages</td><td>Python, TypeScript</td></tr>
+        <tr><td>Frameworks</td><td>FastAPI, React</td></tr>
+        <tr><td>Libraries</td><td>Not detected</td></tr>
+        <tr><td>Frontend</td><td>React</td></tr>
+        <tr><td>Backend</td><td>FastAPI</td></tr>
+        <tr><td>Database</td><td>Not detected</td></tr>
+        <tr><td>APIs</td><td>/api/upload</td></tr>
+        <tr><td>Entry points</td><td>main.py</td></tr>
+        <tr><td>Tests</td><td>Not detected</td></tr>
+      </tbody>
+    </table>
+</section>
+<section class="page chapter has-border" id="anchor-chapter-2">
+  <div class="running-header">
+    <span>CodeGuard AI</span>
+  </div>
+
+  <h1 class="chapter-title">2. Introduction</h1>
+
+      <p>Test intro paragraph.</p>
+      <p>Second paragraph.</p>
+
+</section>
+﻿<section class="page front has-border" id="anchor-appendices">
+  <h1>Appendices</h1>
+  <div class="rule"></div>
+  <p>Appendix content is limited to files and structures detected in the uploaded project archive.</p>
+</section>
+
+<section class="page front has-border" id="anchor-references">
+  <h1>References</h1>
+  <div class="rule"></div>
+      <p>Test ref.</p>
+</section>
+</body>
+</html>

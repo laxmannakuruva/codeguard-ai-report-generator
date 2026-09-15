@@ -1,0 +1,1 @@
+- [Artifact API routing collisions](api-routing-collisions.md) — keep shared proxy paths unique when adding a new backend artifact.

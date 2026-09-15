@@ -1,0 +1,13 @@
+﻿{# ACKNOWLEDGEMENT #}
+<section class="page front" id="anchor-ack">
+  <h1>Acknowledgement</h1>
+  <div class="rule"></div>
+  {% if ctx.acknowledgement and ctx.acknowledgement.paragraphs %}
+    {% for p in ctx.acknowledgement.paragraphs %}
+      <p>{{ p }}</p>
+    {% endfor %}
+  {% else %}
+    <p class="notice">Acknowledgement content is not available.</p>
+  {% endif %}
+</section>
+

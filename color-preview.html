@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>CodeGuard AI — Color Preview</title>
+<style>
+body { margin:0; padding:40px; background:#fafafa; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:#111827; }
+h1 { font-size:24px; margin:0 0 8px; }
+.sub { color:#6b7280; font-size:14px; margin-bottom:32px; }
+.card { background:#fff; border:1px solid #e5e5e5; border-radius:16px; overflow:hidden; margin-bottom:24px; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+.card-header { background:#f5f5f5; padding:20px 24px; border-bottom:1px solid #e5e5e5; }
+.label { font-size:10px; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:#0f766e; margin-bottom:6px; }
+.card h2 { margin:0; font-size:18px; color:#111827; }
+.card-body { padding:24px; }
+.btn { display:inline-block; padding:12px 20px; border-radius:10px; font-weight:700; font-size:14px; margin-right:12px; margin-bottom:12px; }
+.btn-primary { background:#0f766e; color:#fff; }
+.btn-primary:hover { background:#0d655f; }
+.btn-disabled { background:#e5e7eb; color:#9ca3af; cursor:not-allowed; }
+.badge-success { display:inline-flex; align-items:center; gap:6px; background:#fef3c7; color:#92400e; border:1px solid #fde68a; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:700; }
+.badge-success::before { content:""; width:6px; height:6px; border-radius:50%; background:#f59e0b; }
+.swatch-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:16px; }
+.swatch { border-radius:10px; padding:20px; color:#fff; font-size:12px; font-weight:600; }
+.swatch small { display:block; font-weight:400; opacity:.75; margin-top:4px; font-family:monospace; font-size:11px; }
+textarea { width:100%; min-height:80px; padding:12px; border:1px solid #e5e5e5; border-radius:10px; font-family:inherit; font-size:14px; color:#111827; background:#fff; resize:vertical; }
+textarea:focus { outline:none; border-color:#0f766e; box-shadow:0 0 0 3px rgba(15,118,110,.1); }
+</style></head><body>
+
+<h1>CodeGuard AI — New Color Palette</h1>
+<div class="sub">Preview of the proposed colors. All buttons, badges, and text shown in their real states.</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="label">Stage 1 · Project</div>
+    <h2>Upload the project ZIP.</h2>
+  </div>
+  <div class="card-body">
+    <button class="btn btn-primary">Analyze project</button>
+    <button class="btn btn-disabled">Analyze project (disabled)</button>
+    <span class="badge-success">Analyzed</span>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="label">Stage 2 · Context</div>
+    <h2>Add the details that make the report yours.</h2>
+  </div>
+  <div class="card-body">
+    <p style="color:#6b7280; font-size:13px; margin:0 0 10px;">Problem statement</p>
+    <textarea placeholder="Describe the problem this project addresses..."></textarea>
+    <div style="margin-top:16px;">
+      <button class="btn btn-primary">Save problem statement</button>
+      <button class="btn btn-disabled">Upload images (disabled)</button>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="label">Palette</div>
+    <h2>Color swatches</h2>
+  </div>
+  <div class="card-body">
+    <div class="swatch-grid">
+      <div class="swatch" style="background:#0f766e;">Primary<small>#0f766e</small></div>
+      <div class="swatch" style="background:#f59e0b;">Accent<small>#f59e0b</small></div>
+      <div class="swatch" style="background:#e5e7eb; color:#111827;">Disabled<small>#e5e7eb</small></div>
+      <div class="swatch" style="background:#fafafa; color:#111827; border:1px solid #e5e5e5;">Page bg<small>#fafafa</small></div>
+      <div class="swatch" style="background:#f5f5f5; color:#111827;">Header<small>#f5f5f5</small></div>
+      <div class="swatch" style="background:#111827;">Text<small>#111827</small></div>
+    </div>
+  </div>
+</div>
+
+</body></html>

@@ -1,0 +1,31 @@
+﻿{# APPENDICES #}
+<section class="page front" id="anchor-appendices">
+  <h1>Appendices</h1>
+  <div class="rule"></div>
+  <p>Appendix content is limited to files and structures detected in the uploaded project archive.</p>
+  {% if ctx.important_files %}
+    <h2>Important files detected</h2>
+    <table class="data">
+      <thead><tr><th>#</th><th>File</th></tr></thead>
+      <tbody>
+        {% for f in ctx.important_files %}
+          <tr><td>{{ loop.index }}</td><td>{{ f }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+</section>
+
+{# REFERENCES #}
+<section class="page front" id="anchor-references">
+  <h1>References</h1>
+  <div class="rule"></div>
+  {% if ctx.references_section and ctx.references_section.paragraphs %}
+    {% for p in ctx.references_section.paragraphs %}
+      <p>{{ p }}</p>
+    {% endfor %}
+  {% else %}
+    <p class="notice">References are not available.</p>
+  {% endif %}
+</section>
+
