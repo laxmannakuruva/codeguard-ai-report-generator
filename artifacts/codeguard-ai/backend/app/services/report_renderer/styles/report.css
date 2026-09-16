@@ -1,6 +1,6 @@
 ﻿@page {
   size: A4;
-  margin: 0;
+  margin: 22mm 22mm 22mm 22mm;
 }
 
 * { box-sizing: border-box; }
@@ -17,10 +17,8 @@ html, body {
   print-color-adjust: exact;
 }
 
-/* Every section gets exactly ONE page break, AFTER it.
-   This gives every chapter its own page with no blank pages in between. */
+/* No padding here — @page margin handles every physical page. */
 .page {
-  padding: 25mm 22mm 25mm 22mm;
   page-break-after: always;
   break-after: page;
 }
@@ -30,7 +28,7 @@ html, body {
   break-after: auto;
 }
 
-/* Border drawn fixed at 15mm inset — repeats on every physical page. */
+/* Border drawn fixed at 15mm inset — sits between paper edge and content. */
 body::after {
   content: "";
   position: fixed;
@@ -50,14 +48,13 @@ p { margin: 0 0 0.75em 0; text-align: justify; orphans: 3; widows: 3; }
 ul, ol { margin: 0 0 0.8em 1.3em; padding: 0; }
 li { margin: 0.2em 0; }
 
-/* Cover: centered content inside the page */
 .cover {
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 235mm;
+  min-height: 240mm;
 }
 .cover .logo-top { max-height: 70pt; max-width: 180pt; margin-bottom: 32pt; }
 .cover .kicker { font-size: 11pt; letter-spacing: 2.5pt; text-transform: uppercase; color: #000; margin-bottom: 14pt; }
