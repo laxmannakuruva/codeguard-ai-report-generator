@@ -17,31 +17,20 @@ html, body {
   print-color-adjust: exact;
 }
 
-/* Content flows naturally. Only specific sections force a page break. */
+/* Every section gets exactly ONE page break, AFTER it.
+   This gives every chapter its own page with no blank pages in between. */
 .page {
   padding: 25mm 22mm 25mm 22mm;
-}
-
-/* Cover and front matter = own page */
-.page.cover,
-.page.front {
   page-break-after: always;
   break-after: page;
 }
-.page.cover:last-child,
-.page.front:last-child {
+
+.page:last-child {
   page-break-after: auto;
   break-after: auto;
 }
 
-/* Every chapter starts on a fresh page. No blank pages between them. */
-.page.chapter {
-  page-break-before: always;
-  break-before: page;
-}
-
-/* Border drawn fixed at 15mm inset — repeats on every physical page,
-   safely inside the paper so nothing escapes. */
+/* Border drawn fixed at 15mm inset — repeats on every physical page. */
 body::after {
   content: "";
   position: fixed;
