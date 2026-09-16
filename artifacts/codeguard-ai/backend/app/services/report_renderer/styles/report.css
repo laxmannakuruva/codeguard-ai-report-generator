@@ -1,6 +1,6 @@
 ﻿@page {
   size: A4;
-  margin: 22mm 22mm 22mm 22mm;
+  margin: 0;
 }
 
 * { box-sizing: border-box; }
