@@ -22,7 +22,7 @@ html, body {
   padding: 25mm 22mm 25mm 22mm;
 }
 
-/* Cover, front matter, TOC, back matter = own page */
+/* Cover and front matter = own page */
 .page.cover,
 .page.front {
   page-break-after: always;
@@ -34,12 +34,8 @@ html, body {
   break-after: auto;
 }
 
-/* Chapters flow: first chapter starts fresh, the rest continue after previous content */
+/* Every chapter starts on a fresh page. No blank pages between them. */
 .page.chapter {
-  page-break-before: auto;
-  break-before: auto;
-}
-.page.chapter:nth-of-type(1) {
   page-break-before: always;
   break-before: page;
 }
