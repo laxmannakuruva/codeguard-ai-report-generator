@@ -1,11 +1,29 @@
-﻿"""Ollama-powered academic report writer with section-specific prompts."""
+﻿"""AI report writer — supports Ollama (local) and Groq (cloud)."""
 
 import json
-import urllib.request
+import os
 import urllib.error
+import urllib.request
+from pathlib import Path
 
-OLLAMA_URL = "http://localhost:11434"
-OLLAMA_MODEL = "llama3.1:8b"
+# Load .env from the repo root so env vars are available in dev and prod.
+try:
+    from dotenv import load_dotenv
+    _env_path = Path(__file__).resolve().parents[6] / ".env"
+    if _env_path.exists():
+        load_dotenv(_env_path)
+except Exception:
+    pass
+
+AI_PROVIDER = os.getenv("AI_PROVIDER", "ollama").strip().lower()
+
+OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.1:8b")
+
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
+GROQ_MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
+GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
+
 TIMEOUT_SECONDS = 600
 
 
@@ -130,28 +148,6 @@ def _facts_subset(facts, keys):
     return "\n".join(lines) if lines else "- (limited facts)"
 
 
-def _call_ollama(prompt):
-    payload = {
-        "model": OLLAMA_MODEL,
-        "prompt": prompt,
-        "stream": False,
-        "options": {"temperature": 0.55, "num_predict": 1000, "num_ctx": 4096},
-    }
-    data = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(
-        f"{OLLAMA_URL}/api/generate",
-        data=data,
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=TIMEOUT_SECONDS) as resp:
-            body = resp.read().decode("utf-8")
-    except urllib.error.URLError as exc:
-        raise RuntimeError(f"Ollama call failed: {exc}") from exc
-    return (json.loads(body).get("response") or "").strip()
-
-
 def _build_prompt(title, instruction, subset):
     return (
         "You are writing a section of a formal academic internship report.\n\n"
@@ -170,6 +166,82 @@ def _build_prompt(title, instruction, subset):
     )
 
 
+def _call_ollama(prompt):
+    payload = {
+        "model": OLLAMA_MODEL,
+        "prompt": prompt,
+        "stream": False,
+        "options": {"temperature": 0.55, "num_predict": 1000, "num_ctx": 4096},
+    }
+    data = json.dumps(payload).encode("utf-8")
+    req = urllib.request.Request(
+        f"{OLLAMA_URL}/api/generate",
+        data=data,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=TIMEOUT_SECONDS) as resp:
+        body = resp.read().decode("utf-8")
+    return (json.loads(body).get("response") or "").strip()
+
+
+def _call_groq(prompt):
+    """Call Groq via the official SDK with a fallback chain.
+
+    Treats responses under 200 characters as failures (likely refusals),
+    and tries the next model. Each model gets 2 attempts.
+    """
+    if not GROQ_API_KEY:
+        raise RuntimeError("GROQ_API_KEY is not set but AI_PROVIDER=groq")
+
+    from groq import Groq
+
+    client = Groq(api_key=GROQ_API_KEY, timeout=TIMEOUT_SECONDS)
+
+    models_to_try = [
+        GROQ_MODEL,
+        "openai/gpt-oss-120b",
+        "qwen/qwen3.8-27b",
+        "groq/compound-mini",
+        "groq/compound",
+    ]
+
+    system_prompt = (
+        "You are a professional academic writer. "
+        "You write formal, detailed paragraphs for internship reports. "
+        "Always produce the full requested word count. "
+        "Never refuse a writing task. "
+        "Never output apologies or disclaimers."
+    )
+
+    for model_name in models_to_try:
+        for attempt in range(2):
+            try:
+                response = client.chat.completions.create(
+                    model=model_name,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": prompt},
+                    ],
+                    temperature=0.6 + (0.1 * attempt),
+                    max_tokens=1500,
+                )
+                if response.choices:
+                    content = (response.choices[0].message.content or "").strip()
+                    if len(content) >= 200:
+                        return content
+            except Exception:
+                continue
+
+    return ""
+
+
+def _call_ai(prompt):
+    if AI_PROVIDER == "groq":
+        return _call_groq(prompt)
+    return _call_ollama(prompt)
+
+
 def generate_sections(facts, progress=None):
     out = []
     for i, spec in enumerate(SECTION_SPECS, start=1):
@@ -179,7 +251,7 @@ def generate_sections(facts, progress=None):
         subset = _facts_subset(facts, spec["focus_keys"])
         prompt = _build_prompt(title, spec["instruction"], subset)
         try:
-            content = _call_ollama(prompt)
+            content = _call_ai(prompt)
         except Exception as exc:
             content = f"[AI generation failed: {exc}]"
         if not content:
