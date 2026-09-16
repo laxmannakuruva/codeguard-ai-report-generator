@@ -17,15 +17,31 @@ html, body {
   print-color-adjust: exact;
 }
 
-/* Each section is its own page. Padding creates the inner margin. */
+/* Content flows naturally. Only specific sections force a page break. */
 .page {
   padding: 25mm 22mm 25mm 22mm;
+}
+
+/* Cover, front matter, TOC, back matter = own page */
+.page.cover,
+.page.front {
   page-break-after: always;
   break-after: page;
 }
-.page:last-child {
+.page.cover:last-child,
+.page.front:last-child {
   page-break-after: auto;
   break-after: auto;
+}
+
+/* Chapters flow: first chapter starts fresh, the rest continue after previous content */
+.page.chapter {
+  page-break-before: auto;
+  break-before: auto;
+}
+.page.chapter:nth-of-type(1) {
+  page-break-before: always;
+  break-before: page;
 }
 
 /* Border drawn fixed at 15mm inset — repeats on every physical page,
@@ -42,9 +58,9 @@ body::after {
   z-index: 9999;
 }
 
-h1 { font-size: 18pt; line-height: 1.25; color: #000; margin: 0 0 0.6em 0; page-break-after: avoid; }
-h2 { font-size: 13pt; line-height: 1.3; color: #000; margin: 1em 0 0.5em 0; page-break-after: avoid; }
-h3 { font-size: 12pt; color: #000; margin: 0.8em 0 0.4em 0; }
+h1 { font-size: 18pt; line-height: 1.25; color: #000; margin: 0 0 0.6em 0; page-break-after: avoid; break-after: avoid; }
+h2 { font-size: 13pt; line-height: 1.3; color: #000; margin: 1em 0 0.5em 0; page-break-after: avoid; break-after: avoid; }
+h3 { font-size: 12pt; color: #000; margin: 0.8em 0 0.4em 0; page-break-after: avoid; break-after: avoid; }
 p { margin: 0 0 0.75em 0; text-align: justify; orphans: 3; widows: 3; }
 ul, ol { margin: 0 0 0.8em 1.3em; padding: 0; }
 li { margin: 0.2em 0; }
@@ -91,5 +107,16 @@ figure.figure { margin: 14pt auto; text-align: center; page-break-inside: avoid;
 figure.figure img { max-width: 100%; max-height: 260pt; object-fit: contain; border: 1pt solid #000; padding: 4pt; background: #fff; }
 figure.figure figcaption { font-size: 9.5pt; font-style: italic; margin-top: 6pt; color: #333; }
 
-pre.tree, pre.code { font-family: Consolas, 'Courier New', monospace; font-size: 10pt; line-height: 1.4; background: #fafafa; border: 0.8pt solid #333; padding: 8pt 10pt; white-space: pre-wrap; word-break: break-word; page-break-inside: avoid; margin: 6pt 0 12pt 0; }
+pre.tree, pre.code {
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 10pt;
+  line-height: 1.4;
+  background: #fafafa;
+  border: 0.8pt solid #333;
+  padding: 8pt 10pt;
+  white-space: pre-wrap;
+  word-break: break-word;
+  page-break-inside: avoid;
+  margin: 6pt 0 12pt 0;
+}
 .notice, .not-detected { font-style: italic; color: #333; }
