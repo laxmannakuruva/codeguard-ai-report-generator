@@ -1,31 +1,69 @@
 ﻿{# APPENDICES #}
-<section class="page front" id="anchor-appendices">
-  <h1>Appendices</h1>
-  <div class="rule"></div>
-  <p>Appendix content is limited to files and structures detected in the uploaded project archive.</p>
-  {% if ctx.important_files %}
-    <h2>Important files detected</h2>
-    <table class="data">
-      <thead><tr><th>#</th><th>File</th></tr></thead>
-      <tbody>
-        {% for f in ctx.important_files %}
-          <tr><td>{{ loop.index }}</td><td>{{ f }}</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% endif %}
-</section>
+<table class="page front" id="anchor-appendices">
+  <tbody>
+    <tr>
+      <td>
+        <h1>Appendices</h1>
+        <div class="rule"></div>
+
+        <p>
+          Appendix content is limited to files and structures detected in the uploaded project archive.
+        </p>
+
+        {% if ctx.folder_structure and ctx.folder_structure|length > 0 %}
+          <h2>Project folder structure</h2>
+          <pre class="tree">{% for line in ctx.folder_structure %}{{ line }}
+{% endfor %}</pre>
+        {% endif %}
+
+        {% if ctx.important_files and ctx.important_files|length > 0 %}
+          <h2>Important files detected</h2>
+          <table class="data">
+            <thead>
+              <tr><th style="width:8%;">#</th><th>File path</th></tr>
+            </thead>
+            <tbody>
+              {% for f in ctx.important_files %}
+                <tr><td>{{ loop.index }}</td><td>{{ f }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% endif %}
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 {# REFERENCES #}
-<section class="page front" id="anchor-references">
-  <h1>References</h1>
-  <div class="rule"></div>
-  {% if ctx.references_section and ctx.references_section.paragraphs %}
-    {% for p in ctx.references_section.paragraphs %}
-      <p>{{ p }}</p>
-    {% endfor %}
-  {% else %}
-    <p class="notice">References are not available.</p>
-  {% endif %}
-</section>
+<table class="page front" id="anchor-references">
+  <tbody>
+    <tr>
+      <td>
+        <h1>References</h1>
+        <div class="rule"></div>
 
+        {% if ctx.references_section and ctx.references_section.blocks %}
+          {% for block in ctx.references_section.blocks %}
+            {% if block.type == "ol" %}
+              <ol class="references-list">
+                {% for item in block.items %}
+                  <li>{{ item }}</li>
+                {% endfor %}
+              </ol>
+            {% elif block.type == "ul" %}
+              <ul class="references-list">
+                {% for item in block.items %}
+                  <li>{{ item }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p>{{ block.text }}</p>
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          <p class="notice">References are not available.</p>
+        {% endif %}
+      </td>
+    </tr>
+  </tbody>
+</table>
