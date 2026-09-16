@@ -1,5 +1,6 @@
 """Normalize profile + sections into template context."""
 
+import ast
 import json
 import re
 from dataclasses import dataclass, field
@@ -8,6 +9,10 @@ from html import escape
 CONFLICT_RE = re.compile(
     r"<<<<<<<.*?(?:\n|$)|=======.*?(?:\n|$)|>>>>>>>.*?(?:\n|$)", re.S
 )
+NUMBERED_LINE_RE = re.compile(r"^\s*(\d{1,3})[.)]\s+(.+)$")
+BULLET_LINE_RE = re.compile(r"^\s*[-*•]\s+(.+)$")
+INLINE_NUMBERED_RE = re.compile(r"(?:(?<=\s)|^)(\d{1,3})[.)]\s+")
+
 DETECTED = "Not detected"
 PROVIDED = "Not provided"
 FIELDS = (
@@ -71,29 +76,153 @@ def _as_list(v):
     return [_clean(v)]
 
 
+def _flatten_folder_structure(fs):
+    """Convert nested folder dict OR list into clean list of path strings.
+    Handles Python dict strings (single quotes) via ast.literal_eval."""
+    if fs is None:
+        return []
+
+    if isinstance(fs, str):
+        s = fs.strip()
+        if s.startswith("[") or s.startswith("{"):
+            try:
+                fs = ast.literal_eval(s)
+            except Exception:
+                try:
+                    fs = json.loads(s)
+                except Exception:
+                    return [s]
+        else:
+            return [x for x in re.split(r"[\n,]", s) if x.strip()]
+
+    out = []
+
+    def walk(node, prefix):
+        if isinstance(node, dict):
+            files = node.get("_files") or node.get("files") or []
+            if isinstance(files, list):
+                for f in files:
+                    path = f"{prefix}/{f}" if prefix else str(f)
+                    out.append(path)
+            for k, v in node.items():
+                if k in ("_files", "files"):
+                    continue
+                child_prefix = f"{prefix}/{k}" if prefix else str(k)
+                walk(v, child_prefix)
+        elif isinstance(node, list):
+            for f in node:
+                path = f"{prefix}/{f}" if prefix else str(f)
+                out.append(path)
+
+    walk(fs, "")
+    return out
+
+
 def _join(items, sep=", "):
     items = [x for x in items if x]
     return escape(sep.join(items)) if items else DETECTED
 
 
 @dataclass
+class Block:
+    type: str
+    text: str = ""
+    items: list = field(default_factory=list)
+
+
+@dataclass
 class Section:
     title: str
     paragraphs: list = field(default_factory=list)
+    blocks: list = field(default_factory=list)
     heading: str = None
 
 
-def _paras(text):
-    text = CONFLICT_RE.sub("", text or "")
-    if not text.strip():
-        return []
+def _pre_split_inline_numbers(text):
+    """If a line contains 2+ numbered markers like '1. X 2. Y 3. Z', split into lines."""
     out = []
-    for b in re.split(r"\n\s*\n", text):
-        b = re.sub(r"^#{1,6}\s*", "", b, flags=re.MULTILINE)
-        c = " ".join(l.strip() for l in b.splitlines() if l.strip())
-        if c:
-            out.append(c)
-    return out
+    for raw_line in text.split("\n"):
+        matches = list(INLINE_NUMBERED_RE.finditer(raw_line))
+        if len(matches) >= 2:
+            pieces = []
+            for i, m in enumerate(matches):
+                start = m.start()
+                end = matches[i + 1].start() if i + 1 < len(matches) else len(raw_line)
+                pieces.append(raw_line[start:end].strip())
+            # If there's text before the first number, keep it as its own line
+            if matches[0].start() > 0:
+                head = raw_line[: matches[0].start()].strip()
+                if head:
+                    out.append(head)
+            out.extend(pieces)
+        else:
+            out.append(raw_line)
+    return "\n".join(out)
+
+
+def _parse_blocks(text):
+    """Parse raw AI text into typed blocks:
+       - ordered list (N. or N))
+       - bullet list (- * •)
+       - paragraphs
+    First splits any inline '1. ... 2. ... 3. ...' into separate lines."""
+    if not text or not text.strip():
+        return []
+
+    text = CONFLICT_RE.sub("", text)
+    text = _pre_split_inline_numbers(text)
+
+    lines = text.split("\n")
+    blocks = []
+    buffer = []
+    ol_items = []
+    ul_items = []
+
+    def flush_paragraph():
+        if buffer:
+            joined = " ".join(l.strip() for l in buffer if l.strip())
+            joined = re.sub(r"\s+", " ", joined).strip()
+            if joined:
+                blocks.append(Block(type="p", text=joined))
+            buffer.clear()
+
+    def flush_list():
+        nonlocal ol_items, ul_items
+        if ol_items:
+            blocks.append(Block(type="ol", items=list(ol_items)))
+            ol_items = []
+        if ul_items:
+            blocks.append(Block(type="ul", items=list(ul_items)))
+            ul_items = []
+
+    for raw_line in lines:
+        line = raw_line.rstrip()
+        if not line.strip():
+            flush_paragraph()
+            flush_list()
+            continue
+
+        m_num = NUMBERED_LINE_RE.match(line)
+        m_bul = BULLET_LINE_RE.match(line)
+
+        if m_num:
+            flush_paragraph()
+            if ul_items:
+                flush_list()
+            ol_items.append(_clean(m_num.group(2)))
+        elif m_bul:
+            flush_paragraph()
+            if ol_items:
+                flush_list()
+            ul_items.append(_clean(m_bul.group(1)))
+        else:
+            if ol_items or ul_items:
+                flush_list()
+            buffer.append(line)
+
+    flush_paragraph()
+    flush_list()
+    return blocks
 
 
 def _section(obj, i):
@@ -106,7 +235,11 @@ def _section(obj, i):
         title = getattr(obj, "title", None) or getattr(obj, "name", None) or f"Section {i}"
         content = getattr(obj, "content", None) or getattr(obj, "body", None) or ""
     title = _clean(title) or f"Section {i}"
-    return Section(title, _paras(content if isinstance(content, str) else str(content)))
+    if not isinstance(content, str):
+        content = str(content)
+    blocks = _parse_blocks(content)
+    paragraphs = [b.text for b in blocks if b.type == "p"]
+    return Section(title=title, paragraphs=paragraphs, blocks=blocks)
 
 
 def build_context(profile, sections):
@@ -135,7 +268,7 @@ def build_context(profile, sections):
     eps = _as_list(f.get("entry_points"))
     tst = _as_list(f.get("tests"))
     imp = _as_list(f.get("important_files"))
-    fold = _as_list(f.get("folder_structure"))
+    fold = _flatten_folder_structure(f.get("folder_structure"))
 
     return {
         "project_name": escape(pn),

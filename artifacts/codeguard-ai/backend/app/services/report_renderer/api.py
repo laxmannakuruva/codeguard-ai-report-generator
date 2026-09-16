@@ -1,4 +1,4 @@
-﻿"""Report generation entry point (AI-powered, ordered correctly)."""
+﻿"""Report generation entry point (AI-powered)."""
 
 import logging
 import re
@@ -7,7 +7,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 from .design import extract_design, tokens_to_css_vars
-from .content import build_context, Section
+from .content import build_context, Section, _parse_blocks
 from .images import select_project_images
 from .template import render_report_html
 from .qa import inspect_pdf_bytes, format_qa_report
@@ -32,35 +32,57 @@ def _inject(html, pages):
     )
 
 
-def _measure(html, anchors, ph, mt, mb):
-    """Return {anchor_id: page_number}. Cover is page 1."""
-    usable = max(1.0, ph - mt - mb)
-    res = {}
+def _render_once(html, width_pt, height_pt):
     with sync_playwright() as pw:
         b = pw.chromium.launch(headless=True)
         try:
-            p = b.new_page()
+            p = b.new_page(viewport={"width": round(width_pt), "height": round(height_pt)})
             p.set_content(html, wait_until="load")
-            p.wait_for_timeout(200)
-            pos = p.evaluate(
-                """(ids) => {
-                    const o = {};
-                    for (const id of ids) {
-                        const el = document.getElementById(id);
-                        if (!el) { o[id] = null; continue; }
-                        const r = el.getBoundingClientRect();
-                        o[id] = r.top + window.scrollY;
-                    }
-                    return o;
-                }""", anchors,
+            p.wait_for_timeout(250)
+            return p.pdf(
+                print_background=True,
+                prefer_css_page_size=True,
+                display_header_footer=False,
+                margin={"top": "0", "right": "0", "bottom": "0", "left": "0"},
             )
-            for a, y in pos.items():
-                if y is None:
-                    continue
-                res[a] = int(y // usable) + 1
         finally:
             b.close()
-    return res
+
+
+def _measure_via_pdf(pdf_bytes, chapters, has_ack, has_refs):
+    """Search for chapter headings in the rendered PDF to find real page numbers."""
+    import fitz
+
+    doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+    result = {}
+    try:
+        # Chapter anchors
+        for i, ch in enumerate(chapters, 1):
+            heading = ch.heading  # "1. Abstract"
+            page_num = 1
+            for pn in range(len(doc)):
+                page = doc[pn]
+                if page.search_for(heading):
+                    page_num = pn + 1
+                    break
+            result[f"anchor-chapter-{i}"] = page_num
+
+        # Front / back matter
+        for anchor, text in [
+            ("anchor-ack", "Acknowledgement"),
+            ("anchor-appendices", "Appendices"),
+            ("anchor-references", "References"),
+        ]:
+            found = 1
+            for pn in range(len(doc)):
+                page = doc[pn]
+                if page.search_for(text):
+                    found = pn + 1
+                    break
+            result[anchor] = found
+    finally:
+        doc.close()
+    return result
 
 
 def _facts_from_context(ctx):
@@ -84,25 +106,23 @@ def _facts_from_context(ctx):
     }
 
 
-def _split_paragraphs(text):
-    return [p.strip() for p in re.split(r"\n\s*\n", text) if p.strip()]
-
-
 def _ai_to_chapters(ai_sections):
-    """Return (numbered_chapters, acknowledgement, references)."""
     chapters = []
     ack = None
     refs = None
     for item in ai_sections:
         title = (item.get("title") or "").strip()
         lower = title.lower()
-        paras = _split_paragraphs(item.get("content", ""))
+        content = item.get("content", "")
+        blocks = _parse_blocks(content)
+        paragraphs = [b.text for b in blocks if b.type == "p"]
+        section = Section(title=title, paragraphs=paragraphs, blocks=blocks)
         if lower == "acknowledgement":
-            ack = Section(title=title, paragraphs=paras)
+            ack = section
         elif lower == "references":
-            refs = Section(title=title, paragraphs=paras)
+            refs = section
         else:
-            chapters.append(Section(title=title, paragraphs=paras))
+            chapters.append(section)
     for i, ch in enumerate(chapters, 1):
         ch.heading = f"{i}. {ch.title}"
     return chapters, ack, refs
@@ -116,7 +136,6 @@ def generate_report_pdf(project_profile, sections, sample_pdf=None, project_root
     ctx = build_context(project_profile, sections)
     ctx["logo_uri"] = d.logo_uri
 
-    # -------- 1. AI generation --------
     facts = _facts_from_context(ctx)
     try:
         from . import ai_writer
@@ -130,49 +149,31 @@ def generate_report_pdf(project_profile, sections, sample_pdf=None, project_root
     except Exception as exc:
         log.warning("AI generation failed: %s", exc)
         print(f"[AI] FAILED: {exc}", flush=True)
+        chapters, ack, refs = [], None, None
 
-    # -------- 2. Images --------
     imgs = select_project_images(project_root)
-
-    # -------- 3. Render HTML --------
     css_v = tokens_to_css_vars(d)
     css_b = _css_body()
-    h1 = render_report_html(css_v, css_b, ctx, imgs)
 
-    # -------- 4. Two-pass TOC page numbers --------
-    anchors = TOC_RE.findall(h1)
-    pages = {}
-    if anchors:
-        try:
-            pages = _measure(h1, anchors, d.height_pt, d.margin_top_pt, d.margin_bottom_pt)
-            print(f"[TOC] measured {len(pages)} anchors", flush=True)
-        except Exception as e:
-            log.warning("anchor measure failed: %s", e)
+    # ---- PASS 1: render HTML with placeholder TOC numbers → PDF ----
+    html_pass1 = render_report_html(css_v, css_b, ctx, imgs)
+    pdf_pass1 = _render_once(html_pass1, d.width_pt, d.height_pt)
 
-    hf = _inject(h1, pages)
+    # ---- Measure real page numbers from the first PDF ----
+    page_numbers = {}
+    try:
+        page_numbers = _measure_via_pdf(pdf_pass1, chapters, bool(ack), bool(refs))
+        print(f"[TOC] measured {len(page_numbers)} anchors", flush=True)
+    except Exception as e:
+        log.warning("PDF-based measurement failed: %s", e)
 
-    # -------- 5. PDF --------
-    with sync_playwright() as pw:
-        b = pw.chromium.launch(headless=True)
-        try:
-            p = b.new_page(
-                viewport={"width": round(d.width_pt), "height": round(d.height_pt)},
-                device_scale_factor=1,
-            )
-            p.set_content(hf, wait_until="load")
-            p.wait_for_timeout(250)
-            pdf = p.pdf(
-                print_background=True,
-                prefer_css_page_size=True,
-                display_header_footer=False,
-                margin={"top": "0", "right": "0", "bottom": "0", "left": "0"},
-            )
-        finally:
-            b.close()
+    # ---- Inject real numbers, render final PDF ----
+    html_pass2 = _inject(html_pass1, page_numbers)
+    pdf_final = _render_once(html_pass2, d.width_pt, d.height_pt)
 
     try:
-        log.info("\n%s", format_qa_report(inspect_pdf_bytes(pdf)))
+        log.info("\n%s", format_qa_report(inspect_pdf_bytes(pdf_final)))
     except Exception as e:
         log.warning("QA failed: %s", e)
 
-    return pdf
+    return pdf_final

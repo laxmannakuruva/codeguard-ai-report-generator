@@ -229,7 +229,7 @@ def _call_groq(prompt):
                         {"role": "user", "content": prompt},
                     ],
                     temperature=0.6 + (0.1 * attempt),
-                    max_tokens=1500,
+                    max_tokens=2000,
                 )
                 if response.choices:
                     content = (response.choices[0].message.content or "").strip()
