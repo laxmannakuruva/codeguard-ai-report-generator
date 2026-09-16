@@ -17,7 +17,6 @@ html, body {
   print-color-adjust: exact;
 }
 
-/* No padding here — @page margin handles every physical page. */
 .page {
   page-break-after: always;
   break-after: page;
@@ -28,7 +27,6 @@ html, body {
   break-after: auto;
 }
 
-/* Border drawn fixed at 15mm inset — sits between paper edge and content. */
 body::after {
   content: "";
   position: fixed;
@@ -38,7 +36,6 @@ body::after {
   bottom: 15mm;
   border: 1pt solid #000;
   pointer-events: none;
-  z-index: 9999;
 }
 
 h1 { font-size: 18pt; line-height: 1.25; color: #000; margin: 0 0 0.6em 0; page-break-after: avoid; break-after: avoid; }
