@@ -35,6 +35,8 @@ const messageFrom = (error: unknown, fallback: string) => {
   return fallback;
 };
 
+const API_BASE = import.meta.env.VITE_API_URL || "";
+
 export default function ReportStudio({
   projectId,
 }: {
@@ -230,7 +232,7 @@ export default function ReportStudio({
                 Report ready as editable text and PDF.
               </p>
               <a
-                href={`/api/project/${projectId}/report.pdf`}
+                href={`${API_BASE}/api/project/${projectId}/report.pdf`}
                 download="project-report.pdf"
                 className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-[#216e65] px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-[#185b54]"
                 data-testid="button-download-report-pdf"
