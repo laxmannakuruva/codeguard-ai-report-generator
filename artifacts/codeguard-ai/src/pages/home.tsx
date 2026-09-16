@@ -168,7 +168,7 @@ function ProjectStage({
             </div>
             {profile.readme_summary && (
               <p className="mt-3 line-clamp-3 text-xs leading-5 text-[#58766e]">
-                {profile.readme_summary.replace(/<{7}.*?={7}.*?>{7}/gs, "").trim()}
+                {profile.readme_summary.replace(/^<{7}.*$|^={7}.*$|^>{7}.*$/gm, "").trim()}
               </p>
             )}
           </div>
@@ -468,9 +468,6 @@ export default function Home() {
   const [profile, setProfile] = useState<ProjectProfile | null>(null);
 
   useLiquidCursor();
-  const stage1 = useReveal<HTMLDivElement>();
-  const stage2 = useReveal<HTMLDivElement>();
-  const stage3 = useReveal<HTMLDivElement>();
 
   return (
     <div className="min-h-screen bg-[#f6f9f4]">
@@ -488,36 +485,20 @@ export default function Home() {
           </p>
         </header>
 
-        <div
-          ref={stage1.ref}
-          className="cg-reveal"
-          data-revealed={stage1.revealed}
-        >
-          <ProjectStage
-            profile={profile}
-            onProjectAnalyzed={(id, nextProfile) => {
-              setProjectId(id);
-              setProfile(nextProfile);
-            }}
-          />
-        </div>
+        <ProjectStage
+          profile={profile}
+          onProjectAnalyzed={(id, nextProfile) => {
+            setProjectId(id);
+            setProfile(nextProfile);
+          }}
+        />
 
         {projectId && (
-          <div
-            ref={stage2.ref}
-            className="cg-reveal"
-            data-revealed={stage2.revealed}
-          >
-            <ContextStage projectId={projectId} />
-          </div>
+          <ContextStage projectId={projectId} />
         )}
 
         {projectId && (
-          <div
-            ref={stage3.ref}
-            className="cg-reveal mt-6"
-            data-revealed={stage3.revealed}
-          >
+          <div className="mt-6">
             <ReportStudio projectId={projectId} />
           </div>
         )}
