@@ -1,4 +1,4 @@
-﻿"""Report generation entry point (AI-powered)."""
+﻿"""Report generation entry point."""
 
 import logging
 import re
@@ -49,37 +49,36 @@ def _render_once(html, width_pt, height_pt):
             b.close()
 
 
-def _measure_via_pdf(pdf_bytes, chapters, has_ack, has_refs):
-    """Search for chapter headings in the rendered PDF to find real page numbers."""
+def _measure_pages_from_pdf(pdf_bytes, chapters, has_ack, has_refs):
+    """Search rendered PDF for chapter headings. Skip the first 4 pages
+    (cover + acknowledgement + TOC) so we don't match TOC entries."""
     import fitz
 
     doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+    total = len(doc)
+    SKIP = 4  # cover (1) + ack (1) + toc (1) + safety (1)
     result = {}
     try:
-        # Chapter anchors
         for i, ch in enumerate(chapters, 1):
-            heading = ch.heading  # "1. Abstract"
-            page_num = 1
-            for pn in range(len(doc)):
-                page = doc[pn]
-                if page.search_for(heading):
-                    page_num = pn + 1
+            heading = ch.heading
+            found = None
+            for pn in range(SKIP, total):
+                if doc[pn].search_for(heading):
+                    found = pn + 1
                     break
-            result[f"anchor-chapter-{i}"] = page_num
+            result[f"anchor-chapter-{i}"] = found or (SKIP + i)
 
-        # Front / back matter
         for anchor, text in [
             ("anchor-ack", "Acknowledgement"),
             ("anchor-appendices", "Appendices"),
             ("anchor-references", "References"),
         ]:
-            found = 1
-            for pn in range(len(doc)):
-                page = doc[pn]
-                if page.search_for(text):
+            found = None
+            for pn in range(1, total):
+                if doc[pn].search_for(text):
                     found = pn + 1
                     break
-            result[anchor] = found
+            result[anchor] = found or 1
     finally:
         doc.close()
     return result
@@ -137,6 +136,7 @@ def generate_report_pdf(project_profile, sections, sample_pdf=None, project_root
     ctx["logo_uri"] = d.logo_uri
 
     facts = _facts_from_context(ctx)
+    chapters, ack, refs = [], None, None
     try:
         from . import ai_writer
         print("[AI] Generating sections...", flush=True)
@@ -149,25 +149,25 @@ def generate_report_pdf(project_profile, sections, sample_pdf=None, project_root
     except Exception as exc:
         log.warning("AI generation failed: %s", exc)
         print(f"[AI] FAILED: {exc}", flush=True)
-        chapters, ack, refs = [], None, None
 
     imgs = select_project_images(project_root)
     css_v = tokens_to_css_vars(d)
     css_b = _css_body()
 
-    # ---- PASS 1: render HTML with placeholder TOC numbers → PDF ----
+    # PASS 1: render with placeholder TOC numbers
     html_pass1 = render_report_html(css_v, css_b, ctx, imgs)
     pdf_pass1 = _render_once(html_pass1, d.width_pt, d.height_pt)
 
-    # ---- Measure real page numbers from the first PDF ----
+    # Measure real page numbers from the rendered PDF
     page_numbers = {}
     try:
-        page_numbers = _measure_via_pdf(pdf_pass1, chapters, bool(ack), bool(refs))
+        page_numbers = _measure_pages_from_pdf(pdf_pass1, chapters, bool(ack), bool(refs))
         print(f"[TOC] measured {len(page_numbers)} anchors", flush=True)
+        print(f"[TOC] page numbers: {page_numbers}", flush=True)
     except Exception as e:
-        log.warning("PDF-based measurement failed: %s", e)
+        log.warning("PDF measurement failed: %s", e)
 
-    # ---- Inject real numbers, render final PDF ----
+    # PASS 2: inject real page numbers, render final PDF
     html_pass2 = _inject(html_pass1, page_numbers)
     pdf_final = _render_once(html_pass2, d.width_pt, d.height_pt)
 

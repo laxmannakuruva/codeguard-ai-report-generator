@@ -11,7 +11,17 @@ CONFLICT_RE = re.compile(
 )
 NUMBERED_LINE_RE = re.compile(r"^\s*(\d{1,3})[.)]\s+(.+)$")
 BULLET_LINE_RE = re.compile(r"^\s*[-*•]\s+(.+)$")
-INLINE_NUMBERED_RE = re.compile(r"(?:(?<=\s)|^)(\d{1,3})[.)]\s+")
+# Finds N. followed by uppercase anywhere — including after URLs like "/2. Mozilla"
+INLINE_NUMBERED_RE = re.compile(r"(\d{1,3})[.)]\s+(?=[A-Z])")
+
+# Markdown patterns
+MD_ESCAPED_RE = re.compile(r"\\([*_`~#])")
+MD_BOLD_RE = re.compile(r"\*\*([^*]+)\*\*")
+MD_BOLD_ALT_RE = re.compile(r"__([^_]+)__")
+MD_ITALIC_RE = re.compile(r"(?<!\*)\*([^*\n]+)\*(?!\*)")
+MD_ITALIC_ALT_RE = re.compile(r"(?<!_)_([^_\n]+)_(?!_)")
+MD_HEADING_RE = re.compile(r"^#{1,6}\s+", re.MULTILINE)
+MD_CODE_RE = re.compile(r"`([^`]+)`")
 
 DETECTED = "Not detected"
 PROVIDED = "Not provided"
@@ -22,10 +32,23 @@ FIELDS = (
 )
 
 
+def _strip_markdown(s):
+    s = MD_ESCAPED_RE.sub(r"\1", s)
+    s = MD_BOLD_RE.sub(r"\1", s)
+    s = MD_BOLD_ALT_RE.sub(r"\1", s)
+    s = MD_ITALIC_RE.sub(r"\1", s)
+    s = MD_ITALIC_ALT_RE.sub(r"\1", s)
+    s = MD_HEADING_RE.sub("", s)
+    s = MD_CODE_RE.sub(r"\1", s)
+    return s
+
+
 def _clean(v):
     if v is None:
         return ""
-    return re.sub(r"[ \t]+", " ", CONFLICT_RE.sub("", str(v))).strip()
+    s = CONFLICT_RE.sub("", str(v))
+    s = _strip_markdown(s)
+    return re.sub(r"[ \t]+", " ", s).strip()
 
 
 def _read_profile(p):
@@ -77,8 +100,7 @@ def _as_list(v):
 
 
 def _flatten_folder_structure(fs):
-    """Convert nested folder dict OR list into clean list of path strings.
-    Handles Python dict strings (single quotes) via ast.literal_eval."""
+    """Convert nested folder dict OR list into clean list of path strings."""
     if fs is None:
         return []
 
@@ -91,9 +113,9 @@ def _flatten_folder_structure(fs):
                 try:
                     fs = json.loads(s)
                 except Exception:
-                    return [s]
+                    return [x.strip() for x in re.split(r"[\n,]", s) if x.strip()]
         else:
-            return [x for x in re.split(r"[\n,]", s) if x.strip()]
+            return [x.strip() for x in re.split(r"[\n,]", s) if x.strip()]
 
     out = []
 
@@ -115,7 +137,7 @@ def _flatten_folder_structure(fs):
                 out.append(path)
 
     walk(fs, "")
-    return out
+    return sorted(set(out))
 
 
 def _join(items, sep=", "):
@@ -139,33 +161,31 @@ class Section:
 
 
 def _pre_split_inline_numbers(text):
-    """If a line contains 2+ numbered markers like '1. X 2. Y 3. Z', split into lines."""
+    """Split '1. X 2. Y 3. Z' into separate lines."""
     out = []
     for raw_line in text.split("\n"):
         matches = list(INLINE_NUMBERED_RE.finditer(raw_line))
         if len(matches) >= 2:
-            pieces = []
-            for i, m in enumerate(matches):
-                start = m.start()
-                end = matches[i + 1].start() if i + 1 < len(matches) else len(raw_line)
-                pieces.append(raw_line[start:end].strip())
-            # If there's text before the first number, keep it as its own line
-            if matches[0].start() > 0:
-                head = raw_line[: matches[0].start()].strip()
-                if head:
-                    out.append(head)
-            out.extend(pieces)
-        else:
-            out.append(raw_line)
+            # Ensure numbers are sequential (1, 2, 3...) not random years etc.
+            nums = [int(m.group(1)) for m in matches]
+            sequential = nums == list(range(nums[0], nums[0] + len(nums)))
+            if sequential and len(nums) >= 3:
+                pieces = []
+                for i, m in enumerate(matches):
+                    start = m.start()
+                    end = matches[i + 1].start() if i + 1 < len(matches) else len(raw_line)
+                    pieces.append(raw_line[start:end].strip())
+                if matches[0].start() > 0:
+                    head = raw_line[: matches[0].start()].strip()
+                    if head:
+                        out.append(head)
+                out.extend(pieces)
+                continue
+        out.append(raw_line)
     return "\n".join(out)
 
 
 def _parse_blocks(text):
-    """Parse raw AI text into typed blocks:
-       - ordered list (N. or N))
-       - bullet list (- * •)
-       - paragraphs
-    First splits any inline '1. ... 2. ... 3. ...' into separate lines."""
     if not text or not text.strip():
         return []
 
@@ -181,7 +201,7 @@ def _parse_blocks(text):
     def flush_paragraph():
         if buffer:
             joined = " ".join(l.strip() for l in buffer if l.strip())
-            joined = re.sub(r"\s+", " ", joined).strip()
+            joined = _clean(joined)
             if joined:
                 blocks.append(Block(type="p", text=joined))
             buffer.clear()
@@ -189,10 +209,10 @@ def _parse_blocks(text):
     def flush_list():
         nonlocal ol_items, ul_items
         if ol_items:
-            blocks.append(Block(type="ol", items=list(ol_items)))
+            blocks.append(Block(type="ol", items=[_clean(x) for x in ol_items]))
             ol_items = []
         if ul_items:
-            blocks.append(Block(type="ul", items=list(ul_items)))
+            blocks.append(Block(type="ul", items=[_clean(x) for x in ul_items]))
             ul_items = []
 
     for raw_line in lines:
@@ -209,12 +229,12 @@ def _parse_blocks(text):
             flush_paragraph()
             if ul_items:
                 flush_list()
-            ol_items.append(_clean(m_num.group(2)))
+            ol_items.append(m_num.group(2))
         elif m_bul:
             flush_paragraph()
             if ol_items:
                 flush_list()
-            ul_items.append(_clean(m_bul.group(1)))
+            ul_items.append(m_bul.group(1))
         else:
             if ol_items or ul_items:
                 flush_list()
