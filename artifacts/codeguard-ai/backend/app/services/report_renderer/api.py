@@ -165,7 +165,7 @@ def generate_report_pdf(project_profile, sections, sample_pdf=None, project_root
                 print_background=True,
                 prefer_css_page_size=True,
                 display_header_footer=False,
-                margin={"top": "22mm", "right": "22mm", "bottom": "22mm", "left": "22mm"},
+                margin={"top": "0", "right": "0", "bottom": "0", "left": "0"},
             )
         finally:
             b.close()

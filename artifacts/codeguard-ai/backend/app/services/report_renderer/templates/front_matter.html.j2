@@ -1,20 +1,18 @@
 ﻿{# ACKNOWLEDGEMENT #}
-<table class="page front" id="anchor-ack">
-  <tbody>
-    <tr>
-      <td>
-        <h1>Acknowledgement</h1>
-        <div class="rule"></div>
-        {% if ctx.acknowledgement and ctx.acknowledgement.blocks %}
-          {% for block in ctx.acknowledgement.blocks %}
-            {% if block.type == "p" %}
-              <p>{{ block.text }}</p>
-            {% endif %}
-          {% endfor %}
-        {% else %}
-          <p class="notice">Acknowledgement content is not available.</p>
-        {% endif %}
-      </td>
-    </tr>
-  </tbody>
-</table>
+<section class="page front" id="anchor-ack">
+  <h1>Acknowledgement</h1>
+  <div class="rule"></div>
+  {% if ctx.acknowledgement and ctx.acknowledgement.blocks %}
+    {% for block in ctx.acknowledgement.blocks %}
+      {% if block.type == "p" %}
+        <p>{{ block.text }}</p>
+      {% endif %}
+    {% endfor %}
+  {% elif ctx.acknowledgement and ctx.acknowledgement.paragraphs %}
+    {% for para in ctx.acknowledgement.paragraphs %}
+      <p>{{ para }}</p>
+    {% endfor %}
+  {% else %}
+    <p class="notice">Acknowledgement content is not available.</p>
+  {% endif %}
+</section>
