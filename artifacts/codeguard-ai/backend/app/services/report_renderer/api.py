@@ -1,16 +1,13 @@
-﻿"""Report generation entry point."""
+﻿"""Report generation entry point (WeasyPrint)."""
 
 import logging
 import re
 from pathlib import Path
 
-from playwright.sync_api import sync_playwright
-
 from .design import extract_design, tokens_to_css_vars
 from .content import build_context, Section, _parse_blocks
 from .images import select_project_images
 from .template import render_report_html
-from .qa import inspect_pdf_bytes, format_qa_report
 from .exceptions import ReportRenderError
 
 log = logging.getLogger(__name__)
@@ -32,38 +29,24 @@ def _inject(html, pages):
     )
 
 
-def _render_once(html, width_pt, height_pt):
-    with sync_playwright() as pw:
-        b = pw.chromium.launch(headless=True)
-        try:
-            p = b.new_page(viewport={"width": round(width_pt), "height": round(height_pt)})
-            p.set_content(html, wait_until="load")
-            p.wait_for_timeout(250)
-            return p.pdf(
-                print_background=True,
-                prefer_css_page_size=True,
-                display_header_footer=False,
-                margin={"top": "0", "right": "0", "bottom": "0", "left": "0"},
-            )
-        finally:
-            b.close()
+def _render_pdf(html: str) -> bytes:
+    from weasyprint import HTML
+    return HTML(string=html).write_pdf()
 
 
-def _measure_pages_from_pdf(pdf_bytes, chapters, has_ack, has_refs):
-    """Search rendered PDF for chapter headings. Skip the first 4 pages
-    (cover + acknowledgement + TOC) so we don't match TOC entries."""
+def _measure_pages_from_pdf(pdf_bytes, chapters):
+    """Search rendered PDF for chapter headings. Skip first 4 pages (cover, ack, toc)."""
     import fitz
 
     doc = fitz.open(stream=pdf_bytes, filetype="pdf")
     total = len(doc)
-    SKIP = 4  # cover (1) + ack (1) + toc (1) + safety (1)
+    SKIP = 4
     result = {}
     try:
         for i, ch in enumerate(chapters, 1):
-            heading = ch.heading
             found = None
             for pn in range(SKIP, total):
-                if doc[pn].search_for(heading):
+                if doc[pn].search_for(ch.heading):
                     found = pn + 1
                     break
             result[f"anchor-chapter-{i}"] = found or (SKIP + i)
@@ -85,30 +68,15 @@ def _measure_pages_from_pdf(pdf_bytes, chapters, has_ack, has_refs):
 
 
 def _facts_from_context(ctx):
-    return {
-        "project_name": ctx.get("project_name", ""),
-        "project_type": ctx.get("project_type", ""),
-        "languages": ctx.get("languages", []),
-        "frameworks": ctx.get("frameworks", []),
-        "libraries": ctx.get("libraries", []),
-        "frontend": ctx.get("frontend", []),
-        "backend": ctx.get("backend", []),
-        "database": ctx.get("database", []),
-        "apis": ctx.get("apis", []),
-        "modules": ctx.get("modules", []),
-        "features": ctx.get("features", []),
-        "entry_points": ctx.get("entry_points", []),
-        "tests": ctx.get("tests", []),
-        "important_files": ctx.get("important_files", []),
-        "folder_structure": ctx.get("folder_structure", []),
-        "readme_summary": ctx.get("readme_summary", ""),
-    }
+    return {k: ctx.get(k, "" if not isinstance(ctx.get(k), list) else []) for k in [
+        "project_name", "project_type", "languages", "frameworks", "libraries",
+        "frontend", "backend", "database", "apis", "modules", "features",
+        "entry_points", "tests", "important_files", "folder_structure", "readme_summary",
+    ]}
 
 
 def _ai_to_chapters(ai_sections):
-    chapters = []
-    ack = None
-    refs = None
+    chapters, ack, refs = [], None, None
     for item in ai_sections:
         title = (item.get("title") or "").strip()
         lower = title.lower()
@@ -135,12 +103,14 @@ def generate_report_pdf(project_profile, sections, sample_pdf=None, project_root
     ctx = build_context(project_profile, sections)
     ctx["logo_uri"] = d.logo_uri
 
-    facts = _facts_from_context(ctx)
     chapters, ack, refs = [], None, None
     try:
         from . import ai_writer
         print("[AI] Generating sections...", flush=True)
-        ai_sections = ai_writer.generate_sections(facts, progress=lambda m: print(m, flush=True))
+        ai_sections = ai_writer.generate_sections(
+            _facts_from_context(ctx),
+            progress=lambda m: print(m, flush=True),
+        )
         chapters, ack, refs = _ai_to_chapters(ai_sections)
         ctx["chapters"] = chapters
         ctx["acknowledgement"] = ack
@@ -154,26 +124,15 @@ def generate_report_pdf(project_profile, sections, sample_pdf=None, project_root
     css_v = tokens_to_css_vars(d)
     css_b = _css_body()
 
-    # PASS 1: render with placeholder TOC numbers
     html_pass1 = render_report_html(css_v, css_b, ctx, imgs)
-    pdf_pass1 = _render_once(html_pass1, d.width_pt, d.height_pt)
+    pdf_pass1 = _render_pdf(html_pass1)
 
-    # Measure real page numbers from the rendered PDF
     page_numbers = {}
     try:
-        page_numbers = _measure_pages_from_pdf(pdf_pass1, chapters, bool(ack), bool(refs))
-        print(f"[TOC] measured {len(page_numbers)} anchors", flush=True)
+        page_numbers = _measure_pages_from_pdf(pdf_pass1, chapters)
         print(f"[TOC] page numbers: {page_numbers}", flush=True)
     except Exception as e:
         log.warning("PDF measurement failed: %s", e)
 
-    # PASS 2: inject real page numbers, render final PDF
     html_pass2 = _inject(html_pass1, page_numbers)
-    pdf_final = _render_once(html_pass2, d.width_pt, d.height_pt)
-
-    try:
-        log.info("\n%s", format_qa_report(inspect_pdf_bytes(pdf_final)))
-    except Exception as e:
-        log.warning("QA failed: %s", e)
-
-    return pdf_final
+    return _render_pdf(html_pass2)
