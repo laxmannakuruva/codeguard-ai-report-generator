@@ -1,6 +1,6 @@
 ﻿@page {
   size: A4;
-  margin: 20mm 18mm 20mm 18mm;
+  margin: 15mm 15mm 15mm 15mm;
 }
 
 * { box-sizing: border-box; }
@@ -12,112 +12,60 @@ html, body {
   color: #000;
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 11.5pt;
-  line-height: 1.7;
+  line-height: 1.65;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
 
-.page {
+/* Each section is a TABLE. Cell borders repeat on every printed page. */
+table.page {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
   page-break-after: always;
   break-after: page;
 }
 
-.page:last-child {
+table.page:last-child {
   page-break-after: auto;
   break-after: auto;
+}
+
+table.page > tbody > tr > td {
+  border: 1pt solid #000;
+  padding: 8mm 8mm 8mm 8mm;
+  vertical-align: top;
+  width: 100%;
 }
 
 /* ---------- Typography ---------- */
 
 h1 { font-size: 18pt; line-height: 1.3; color: #000; margin: 0 0 12pt 0; page-break-after: avoid; break-after: avoid; }
-h2 { font-size: 13pt; line-height: 1.3; color: #000; margin: 18pt 0 8pt 0; page-break-after: avoid; break-after: avoid; }
-h3 { font-size: 12pt; color: #000; margin: 14pt 0 6pt 0; page-break-after: avoid; break-after: avoid; }
-
-p {
-  margin: 0 0 10pt 0;
-  text-align: justify;
-  text-justify: inter-word;
-  orphans: 4;
-  widows: 4;
-}
-
-ol, ul {
-  margin: 6pt 0 14pt 0;
-  padding-left: 24pt;
-}
-
-li {
-  margin: 0 0 8pt 0;
-  line-height: 1.65;
-  text-align: justify;
-}
+h2 { font-size: 13pt; line-height: 1.3; color: #000; margin: 16pt 0 8pt 0; page-break-after: avoid; break-after: avoid; }
+p { margin: 0 0 10pt 0; text-align: justify; orphans: 4; widows: 4; }
+ol, ul { margin: 6pt 0 14pt 0; padding-left: 24pt; }
+li { margin: 0 0 8pt 0; line-height: 1.65; text-align: justify; }
 
 /* ---------- Cover ---------- */
 
-.cover {
-  text-align: center;
-  padding-top: 60mm;
-}
-
-.cover .kicker {
-  font-size: 11pt;
-  letter-spacing: 3pt;
-  text-transform: uppercase;
-  color: #000;
-  margin-bottom: 22pt;
-}
-
-.cover .on {
-  font-size: 12pt;
-  letter-spacing: 1.5pt;
-  margin: 8pt 0;
-  color: #000;
-}
-
-.cover h1.project-title {
-  font-size: 26pt;
-  line-height: 1.25;
-  margin: 20pt 0 40pt 0;
-  color: #000;
-  font-weight: 700;
-}
-
-.cover .submission {
-  font-style: italic;
-  font-size: 11pt;
-  max-width: 80%;
-  margin: 40pt auto 0 auto;
-  color: #333;
-}
+.cover td { text-align: center; vertical-align: middle; height: 250mm; }
+.cover .kicker { font-size: 11pt; letter-spacing: 3pt; text-transform: uppercase; color: #000; margin-bottom: 22pt; }
+.cover .on { font-size: 12pt; letter-spacing: 1.5pt; margin: 8pt 0; color: #000; }
+.cover h1.project-title { font-size: 26pt; line-height: 1.25; margin: 20pt 0 30pt 0; color: #000; font-weight: 700; }
+.cover .by { font-size: 12pt; margin-top: 30pt; }
+.cover .student-line { font-size: 13pt; margin: 4pt 0; font-weight: 600; }
+.cover .submission { font-style: italic; font-size: 11pt; margin: 30pt auto 0 auto; color: #333; max-width: 80%; }
+.cover .date { font-size: 12pt; margin-top: 30pt; }
 
 /* ---------- Front matter ---------- */
 
-.front h1 {
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 1.5pt;
-  margin: 0 0 6pt 0;
-}
-
-.front .rule {
-  height: 1.2pt;
-  background: #000;
-  margin: 0 auto 22pt auto;
-  width: 30%;
-}
+.front h1 { text-align: center; text-transform: uppercase; letter-spacing: 1.5pt; margin: 0 0 6pt 0; }
+.front .rule { height: 1.2pt; background: #000; margin: 0 auto 22pt auto; width: 30%; }
 
 /* ---------- Chapter ---------- */
 
-.chapter .chapter-title {
-  color: #000;
-  border-bottom: 1.2pt solid #000;
-  padding-bottom: 6pt;
-  margin: 0 0 16pt 0;
-  text-align: left;
-  font-size: 18pt;
-}
-
-.chapter h2 { color: #000; margin-top: 20pt; }
+.chapter .chapter-title { color: #000; border-bottom: 1.2pt solid #000; padding-bottom: 6pt; margin: 0 0 16pt 0; text-align: left; font-size: 18pt; }
+.chapter h2 { color: #000; margin-top: 18pt; }
 
 /* ---------- TOC ---------- */
 
@@ -127,32 +75,13 @@ li {
 .toc-list .toc-dots { flex: 1; border-bottom: 1pt dotted #333; transform: translateY(-3pt); }
 .toc-list .toc-page { min-width: 2ch; text-align: right; color: #000; font-weight: 700; }
 
-/* ---------- Tables ---------- */
+/* ---------- Data tables ---------- */
 
-table.data {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 12pt 0 18pt 0;
-  font-size: 10.5pt;
-}
-
-table.data th, table.data td {
-  border: 0.75pt solid #000;
-  padding: 7pt 9pt;
-  text-align: left;
-  vertical-align: top;
-  line-height: 1.5;
-}
-
+table.data { width: 100%; border-collapse: collapse; margin: 12pt 0 18pt 0; font-size: 10.5pt; }
+table.data th, table.data td { border: 0.75pt solid #000; padding: 7pt 9pt; text-align: left; vertical-align: top; line-height: 1.5; }
 table.data th { background: #f0f0f0; font-weight: 700; }
 
-.summary-grid {
-  display: grid;
-  grid-template-columns: 30% 70%;
-  border: 0.75pt solid #000;
-  margin: 12pt 0 18pt 0;
-}
-
+.summary-grid { display: grid; grid-template-columns: 30% 70%; border: 0.75pt solid #000; margin: 12pt 0 18pt 0; }
 .summary-grid > div { padding: 7pt 9pt; border-bottom: 0.75pt solid #000; }
 .summary-grid > div:nth-child(odd) { background: #f5f5f5; font-weight: 700; }
 
@@ -169,16 +98,5 @@ figure.figure figcaption { font-size: 9.5pt; font-style: italic; margin-top: 6pt
 
 /* ---------- Misc ---------- */
 
-pre.tree {
-  font-family: Consolas, 'Courier New', monospace;
-  font-size: 9.5pt;
-  line-height: 1.5;
-  background: #fafafa;
-  border: 0.75pt solid #333;
-  padding: 10pt 12pt;
-  white-space: pre-wrap;
-  word-break: break-all;
-  margin: 8pt 0 14pt 0;
-}
-
+pre.tree { font-family: Consolas, 'Courier New', monospace; font-size: 9.5pt; line-height: 1.5; background: #fafafa; border: 0.75pt solid #333; padding: 10pt 12pt; white-space: pre-wrap; word-break: break-all; margin: 8pt 0 14pt 0; }
 .notice, .not-detected { font-style: italic; color: #333; }

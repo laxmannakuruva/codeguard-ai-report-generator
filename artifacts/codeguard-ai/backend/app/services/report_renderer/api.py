@@ -43,7 +43,7 @@ def _render_once(html, width_pt, height_pt):
                 print_background=True,
                 prefer_css_page_size=True,
                 display_header_footer=False,
-                margin={"top": "20mm", "right": "18mm", "bottom": "20mm", "left": "0"},
+                margin={"top": "0", "right": "0", "bottom": "0", "left": "0"},
             )
         finally:
             b.close()

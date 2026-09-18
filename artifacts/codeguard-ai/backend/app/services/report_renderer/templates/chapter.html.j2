@@ -1,31 +1,37 @@
 ﻿{% for ch in ctx.chapters %}
-<section class="page chapter" id="anchor-chapter-{{ loop.index }}">
-  <h1 class="chapter-title">{{ ch.heading }}</h1>
+<table class="page chapter" id="anchor-chapter-{{ loop.index }}">
+  <tbody>
+    <tr>
+      <td>
+        <h1 class="chapter-title">{{ ch.heading }}</h1>
 
-  {% if ch.blocks %}
-    {% for block in ch.blocks %}
-      {% if block.type == "p" %}
-        <p>{{ block.text }}</p>
-      {% elif block.type == "ol" %}
-        <ol>
-          {% for item in block.items %}
-            <li>{{ item }}</li>
+        {% if ch.blocks %}
+          {% for block in ch.blocks %}
+            {% if block.type == "p" %}
+              <p>{{ block.text }}</p>
+            {% elif block.type == "ol" %}
+              <ol>
+                {% for item in block.items %}
+                  <li>{{ item }}</li>
+                {% endfor %}
+              </ol>
+            {% elif block.type == "ul" %}
+              <ul>
+                {% for item in block.items %}
+                  <li>{{ item }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
           {% endfor %}
-        </ol>
-      {% elif block.type == "ul" %}
-        <ul>
-          {% for item in block.items %}
-            <li>{{ item }}</li>
+        {% elif ch.paragraphs %}
+          {% for para in ch.paragraphs %}
+            <p>{{ para }}</p>
           {% endfor %}
-        </ul>
-      {% endif %}
-    {% endfor %}
-  {% elif ch.paragraphs %}
-    {% for para in ch.paragraphs %}
-      <p>{{ para }}</p>
-    {% endfor %}
-  {% else %}
-    <p class="notice">No verified content was detected for this section.</p>
-  {% endif %}
-</section>
+        {% else %}
+          <p class="notice">No verified content was detected for this section.</p>
+        {% endif %}
+      </td>
+    </tr>
+  </tbody>
+</table>
 {% endfor %}
