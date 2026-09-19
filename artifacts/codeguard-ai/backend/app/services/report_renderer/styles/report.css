@@ -286,3 +286,50 @@ figure.figure figcaption {
     content: none;
   }
 }
+
+/* ================= FINAL FIXES ================= */
+
+/* 1. Cover: force student name and roll number to stack on separate lines */
+.cover .student-line {
+  display: block !important;
+  width: 100% !important;
+  clear: both !important;
+  text-align: center;
+}
+.cover .by { display: block !important; }
+.cover .kicker, .cover .on, .cover .submission, .cover .date {
+  display: block !important;
+}
+
+/* 2. Headings: ensure h1 is block, add bottom margin so following paragraph has space */
+.chapter-title, .page.front h1, .cover h1 {
+  display: block !important;
+}
+h1 + p, h1 + div, h1 + h2 {
+  margin-top: 12pt !important;
+}
+.page.front h1 { margin-bottom: 14pt !important; }
+
+/* 3. Remove any stray page-number artifacts at top of pages */
+@page {
+  @top-left { content: none !important; }
+  @top-center { content: none !important; }
+  @top-right { content: none !important; }
+}
+
+/* 4. Ensure page numbers show at bottom-center of every page except cover */
+@page {
+  @bottom-center {
+    content: counter(page);
+    font-size: 10pt;
+    color: #333;
+    font-family: Georgia, "Times New Roman", serif;
+    vertical-align: middle;
+    padding-bottom: 6mm;
+  }
+}
+@page :first {
+  @bottom-center {
+    content: none !important;
+  }
+}
