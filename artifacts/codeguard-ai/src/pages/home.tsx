@@ -35,10 +35,10 @@ const formatBytes = (bytes: number) => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
-const API_BASE = "/api";
+const API_BASE = "https://codeguard-ai-report-generator.onrender.com";
 
 /* -------------------------------------------------------------- */
-/* STAGE 1 — project upload                                        */
+/* STAGE 1 ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â project upload                                        */
 /* -------------------------------------------------------------- */
 
 function ProjectStage({
@@ -86,7 +86,7 @@ function ProjectStage({
         <div>
           <div className="mb-1 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[#4d907e]">
             <Upload size={12} />
-            Stage 1 · Project
+            Stage 1 ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· Project
           </div>
           <h2 className="text-xl font-semibold tracking-tight text-[#0f2e2c]">
             Upload the project ZIP.
@@ -121,7 +121,7 @@ function ProjectStage({
               {file ? file.name : "Choose your project ZIP"}
             </span>
             <span className="mt-1 text-xs text-[#9aa69e]">
-              {file ? formatBytes(file.size) : "ZIP · Max 50 MB"}
+              {file ? formatBytes(file.size) : "ZIP ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· Max 50 MB"}
             </span>
           </label>
 
@@ -137,9 +137,9 @@ function ProjectStage({
               <Upload size={15} />
             )}
             {uploadProject.isPending
-              ? "Uploading…"
+              ? "UploadingÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦"
               : analyzeProject.isPending
-                ? "Analyzing…"
+                ? "AnalyzingÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦"
                 : "Analyze project"}
           </button>
         </div>
@@ -179,7 +179,7 @@ function ProjectStage({
 }
 
 /* -------------------------------------------------------------- */
-/* STAGE 2 — context (problem statement + images + sample)         */
+/* STAGE 2 ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â context (problem statement + images + sample)         */
 /* -------------------------------------------------------------- */
 
 function ContextStage({ projectId }: { projectId: string }) {
@@ -213,7 +213,7 @@ function ContextStage({ projectId }: { projectId: string }) {
     setError(null);
     try {
       const r = await fetch(
-        `${API_BASE}/project/${projectId}/problem-statement`,
+        `${API_BASE}/api/project/${projectId}/problem-statement`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -236,7 +236,7 @@ function ContextStage({ projectId }: { projectId: string }) {
     try {
       const form = new FormData();
       images.forEach((f) => form.append("files", f));
-      const r = await fetch(`${API_BASE}/project/${projectId}/images`, {
+      const r = await fetch(`${API_BASE}/api/project/${projectId}/images`, {
         method: "POST",
         body: form,
       });
@@ -290,7 +290,7 @@ function ContextStage({ projectId }: { projectId: string }) {
       <header className="border-b border-[#eef2eb] bg-[#f8fbf6] px-6 py-5">
         <div className="mb-1 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[#4d907e]">
           <Sparkles size={12} />
-          Stage 2 · Context
+          Stage 2 ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· Context
         </div>
         <h2 className="text-xl font-semibold tracking-tight text-[#0f2e2c]">
           Add the details that make the report yours.
@@ -382,7 +382,7 @@ function ContextStage({ projectId }: { projectId: string }) {
                 : "Choose images"}
             </span>
             <span className="mt-1 text-xs text-[#9aa69e]">
-              PNG, JPG, GIF, WEBP · Max 8 MB each
+              PNG, JPG, GIF, WEBP ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· Max 8 MB each
             </span>
           </label>
           {images.length > 0 && (
@@ -405,7 +405,7 @@ function ContextStage({ projectId }: { projectId: string }) {
                     className="rounded px-1 text-[#934a39] hover:bg-[#fff4f0]"
                     aria-label={`Remove ${f.name}`}
                   >
-                    ✕
+                    ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢
                   </button>
                 </li>
               ))}
