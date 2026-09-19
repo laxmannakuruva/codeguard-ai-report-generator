@@ -98,6 +98,7 @@ async def download_report_pdf(project_id: str) -> Response:
         sections_for_pdf,
         project.sample_report_bytes,
         project.root,
+        project.project_images,
     )
     return Response(
         content=pdf,

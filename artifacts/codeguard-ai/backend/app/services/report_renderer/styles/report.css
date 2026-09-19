@@ -175,3 +175,27 @@ figure.figure .figure-placeholder {
   font-family: Consolas, monospace; font-size: 10pt; color: #666;
 }
 figure.figure figcaption { font-size: 9.5pt; font-style: italic; margin-top: 6pt; }
+
+
+/* TOC: dots + page numbers */
+.toc-list { list-style: none !important; padding: 0 !important; margin: 12pt 0 0 0 !important; }
+.toc-list li { display: flex !important; align-items: baseline; margin: 8pt 0 !important; }
+.toc-list .toc-title { font-weight: 600; flex-shrink: 0; }
+.toc-list .toc-dots {
+  flex: 1;
+  border-bottom: 1pt dotted #333;
+  margin: 0 6pt;
+  transform: translateY(-4pt);
+  min-width: 20pt;
+}
+.toc-list .toc-page { font-weight: 700; flex-shrink: 0; min-width: 2ch; text-align: right; }
+
+/* Cover stacked lines */
+.cover .student-line { display: block !important; width: 100%; font-size: 13pt; margin: 4pt 0; font-weight: 600; }
+.cover .by { display: block !important; }
+
+/* Gallery */
+.gallery { display: block; margin-top: 12pt; }
+.gallery-item { display: block; page-break-inside: avoid; margin: 14pt 0; text-align: center; }
+.gallery-item img { max-width: 100%; max-height: 320pt; border: 0.75pt solid #333; padding: 4pt; }
+.gallery-item figcaption { font-size: 10pt; font-style: italic; margin-top: 6pt; color: #333; }

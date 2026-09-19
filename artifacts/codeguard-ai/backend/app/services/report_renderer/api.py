@@ -1,4 +1,4 @@
-﻿"""Report generation entry point (WeasyPrint)."""
+"""Report generation entry point (WeasyPrint)."""
 
 import logging
 import re
@@ -6,7 +6,7 @@ from pathlib import Path
 
 from .design import extract_design, tokens_to_css_vars
 from .content import build_context, Section, _parse_blocks
-from .images import select_project_images
+from .images import select_project_images, ReportImage
 from .template import render_report_html
 from .exceptions import ReportRenderError
 
@@ -53,6 +53,7 @@ def _measure_pages_from_pdf(pdf_bytes, chapters):
 
         for anchor, text in [
             ("anchor-ack", "Acknowledgement"),
+            ("anchor-gallery", "Project Image Gallery"),
             ("anchor-appendices", "Appendices"),
             ("anchor-references", "References"),
         ]:
@@ -65,6 +66,22 @@ def _measure_pages_from_pdf(pdf_bytes, chapters):
     finally:
         doc.close()
     return result
+
+
+def _uploaded_to_report_images(uploaded):
+    import base64
+    from pathlib import Path
+    out = []
+    for img in uploaded or []:
+        data = img.get("data") if isinstance(img, dict) else None
+        if not data:
+            continue
+        mime = (img.get("content_type") if isinstance(img, dict) else None) or "image/png"
+        uri = f"data:{mime};base64,{base64.b64encode(data).decode('ascii')}"
+        name = (img.get("filename") if isinstance(img, dict) else None) or "image"
+        caption = Path(name).stem.replace("_", " ").replace("-", " ").capitalize()
+        out.append(ReportImage(uri, caption, name))
+    return out
 
 
 def _facts_from_context(ctx):
@@ -95,7 +112,7 @@ def _ai_to_chapters(ai_sections):
     return chapters, ack, refs
 
 
-def generate_report_pdf(project_profile, sections, sample_pdf=None, project_root=None):
+def generate_report_pdf(project_profile, sections, sample_pdf=None, project_root=None, uploaded_images=None):
     if not sample_pdf:
         raise ReportRenderError("A sample PDF is required.")
 
@@ -120,7 +137,9 @@ def generate_report_pdf(project_profile, sections, sample_pdf=None, project_root
         log.warning("AI generation failed: %s", exc)
         print(f"[AI] FAILED: {exc}", flush=True)
 
-    imgs = select_project_images(project_root)
+    uploaded_imgs = _uploaded_to_report_images(uploaded_images)
+    disk_imgs = select_project_images(project_root)
+    imgs = (uploaded_imgs + disk_imgs)[:8]
     css_v = tokens_to_css_vars(d)
     css_b = _css_body()
 
