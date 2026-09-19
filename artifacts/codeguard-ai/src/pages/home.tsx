@@ -369,9 +369,10 @@ function ContextStage({ projectId }: { projectId: string }) {
               onChange={(e) => {
                 const files = Array.from(e.target.files ?? []);
                 if (files.length) {
-                  setImages(files);
+                  setImages((prev) => [...prev, ...files]);
                   setImagesSaved(false);
                 }
+                e.target.value = "";
               }}
             />
             <FileImage size={24} className="mb-2 text-[#68a28f]" strokeWidth={1.5} />
@@ -384,6 +385,44 @@ function ContextStage({ projectId }: { projectId: string }) {
               PNG, JPG, GIF, WEBP · Max 8 MB each
             </span>
           </label>
+          {images.length > 0 && (
+            <ul className="mt-3 space-y-1">
+              {images.map((f, i) => (
+                <li
+                  key={`${f.name}-${i}`}
+                  className="flex items-center justify-between gap-2 rounded-md border border-[#e5ebe0] bg-white px-2 py-1 text-xs text-[#41605e]"
+                >
+                  <span className="truncate">
+                    {i + 1}. {f.name}{" "}
+                    <span className="text-[#9aa69e]">({formatBytes(f.size)})</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setImages((prev) => prev.filter((_, idx) => idx !== i));
+                      setImagesSaved(false);
+                    }}
+                    className="rounded px-1 text-[#934a39] hover:bg-[#fff4f0]"
+                    aria-label={`Remove ${f.name}`}
+                  >
+                    ✕
+                  </button>
+                </li>
+              ))}
+              <li className="pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setImages([]);
+                    setImagesSaved(false);
+                  }}
+                  className="text-[11px] font-bold text-[#934a39] hover:underline"
+                >
+                  Clear all
+                </button>
+              </li>
+            </ul>
+          )}
           <button
             type="button"
             onClick={saveImages}

@@ -1,17 +1,14 @@
+{% if images and images|length > 0 %}
 <section class="page front" id="anchor-gallery">
   <h1>Project Image Gallery</h1>
   <div class="rule"></div>
-
-  {% if images and images|length > 0 %}
-    <div class="gallery">
-      {% for img in images %}
-        <figure class="gallery-item">
-          <img src="{{ img.data_uri }}" alt="{{ img.caption }}">
-          <figcaption>Figure {{ loop.index }}: {{ img.caption }}</figcaption>
-        </figure>
-      {% endfor %}
-    </div>
-  {% else %}
-    <p class="notice">No images were uploaded for this report.</p>
-  {% endif %}
+  <div class="gallery">
+    {% for img in images %}
+      <figure class="gallery-item">
+        <img src="{{ img.data_uri }}" alt="{{ img.caption }}">
+        <figcaption>Figure {{ loop.index }}: {{ img.caption }}</figcaption>
+      </figure>
+    {% endfor %}
+  </div>
 </section>
+{% endif %}

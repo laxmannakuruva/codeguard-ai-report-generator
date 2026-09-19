@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 
 from .design import extract_design, tokens_to_css_vars
-from .content import build_context, Section, _parse_blocks
+from .content import build_context, Section, _parse_blocks, Block
 from .images import select_project_images, ReportImage
 from .template import render_report_html
 from .exceptions import ReportRenderError
@@ -84,6 +84,42 @@ def _uploaded_to_report_images(uploaded):
     return out
 
 
+import hashlib
+import json as _json
+
+
+def _cache_key(sections):
+    data = _json.dumps(
+        [{"id": getattr(s, "id", ""), "title": getattr(s, "title", ""),
+          "content": getattr(s, "content", "")} for s in sections],
+        sort_keys=True, default=str,
+    )
+    return hashlib.sha256(data.encode()).hexdigest()[:16]
+
+
+def _load_cache(project_root, key):
+    if not project_root:
+        return None
+    f = Path(project_root) / ".report_cache" / f"{key}.json"
+    if f.exists():
+        try:
+            return _json.loads(f.read_text(encoding="utf-8"))
+        except Exception:
+            return None
+    return None
+
+
+def _save_cache(project_root, key, sections):
+    if not project_root:
+        return
+    try:
+        d = Path(project_root) / ".report_cache"
+        d.mkdir(exist_ok=True, parents=True)
+        (d / f"{key}.json").write_text(_json.dumps(sections), encoding="utf-8")
+    except Exception:
+        pass
+
+
 def _facts_from_context(ctx):
     return {k: ctx.get(k, "" if not isinstance(ctx.get(k), list) else []) for k in [
         "project_name", "project_type", "languages", "frameworks", "libraries",
@@ -125,11 +161,18 @@ def generate_report_pdf(project_profile, sections, sample_pdf=None, project_root
     chapters, ack, refs = [], None, None
     try:
         from . import ai_writer
-        print("[AI] Generating sections...", flush=True)
-        ai_sections = ai_writer.generate_sections(
-            _facts_from_context(ctx),
-            progress=lambda m: print(m, flush=True),
-        )
+        _key = _cache_key(sections)
+        _cached = _load_cache(project_root, _key)
+        if _cached:
+            print(f"[AI] Using cached sections ({_key})", flush=True)
+            ai_sections = _cached
+        else:
+            print(f"[AI] Generating sections ({_key})...", flush=True)
+            ai_sections = ai_writer.generate_sections(
+                _facts_from_context(ctx),
+                progress=lambda m: print(m, flush=True),
+            )
+            _save_cache(project_root, _key, ai_sections)
         chapters, ack, refs, abstract = _ai_to_chapters(ai_sections)
         ctx["chapters"] = chapters
         ctx["acknowledgement"] = ack
@@ -143,6 +186,23 @@ def generate_report_pdf(project_profile, sections, sample_pdf=None, project_root
     uploaded_imgs = _uploaded_to_report_images(uploaded_images)
     disk_imgs = select_project_images(project_root)
     imgs = (uploaded_imgs + disk_imgs)[:8]
+    if imgs:
+        target = None
+        for ch in chapters:
+            if "result" in (ch.title or "").lower():
+                target = ch
+                break
+        if target is None and chapters:
+            target = chapters[-1]
+        if target is not None:
+            for i, img in enumerate(imgs, 1):
+                target.blocks.append(Block(
+                    type="figure",
+                    text=f"Figure {i}: {img.caption}",
+                    image_uri=img.data_uri,
+                ))
+            print(f"[IMG] Injected {len(imgs)} images into '{target.title}'", flush=True)
+    imgs = []
     css_v = tokens_to_css_vars(d)
     css_b = _css_body()
 

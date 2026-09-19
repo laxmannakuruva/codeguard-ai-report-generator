@@ -11,8 +11,8 @@ SKIP_RE = re.compile(
     r"(favicon|sprite|icon[-_]|logo|badge|watermark|placeholder|apple-touch|manifest)",
     re.I,
 )
-PREFERRED = ("screenshot", "screens", "docs", "doc", "assets", "images", "img", "media")
-MIN_SIDE = 200
+PREFERRED = ("_user_uploads", "user_uploads", "screenshot", "screens", "docs", "doc", "assets", "images", "img", "media")
+MIN_SIDE = 50
 MAX_N = 6
 
 

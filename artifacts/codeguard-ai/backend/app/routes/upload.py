@@ -123,6 +123,22 @@ async def upload_project_images(
             "data": data,
             "content_type": f.content_type or "image/png",
         })
+        try:
+            from pathlib import Path as _P
+            disk_dir = _P(project.root) / "_user_uploads"
+            disk_dir.mkdir(exist_ok=True, parents=True)
+            safe_name = filename.replace("/", "_").replace("\\", "_") or "image.png"
+            (disk_dir / safe_name).write_bytes(data)
+        except Exception:
+            pass
+        try:
+            from pathlib import Path as _P
+            disk_dir = _P(project.root) / "_user_uploads"
+            disk_dir.mkdir(exist_ok=True, parents=True)
+            safe_name = filename.replace("/", "_").replace("\\", "_") or "image.png"
+            (disk_dir / safe_name).write_bytes(data)
+        except Exception:
+            pass
         stored.append({
             "project_id": project_id,
             "filename": filename,

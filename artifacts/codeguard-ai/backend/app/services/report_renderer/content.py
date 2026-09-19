@@ -204,6 +204,7 @@ class Block:
     type: str
     text: str = ""
     items: list = field(default_factory=list)
+    image_uri: str = ""
 
 
 @dataclass
