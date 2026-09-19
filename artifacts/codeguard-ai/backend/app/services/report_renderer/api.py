@@ -6,7 +6,7 @@ from pathlib import Path
 
 from .design import extract_design, tokens_to_css_vars
 from .content import build_context, Section, _parse_blocks, Block
-from .pdf_structure import extract_structure, Block
+from .pdf_structure import extract_structure
 from .images import select_project_images, ReportImage
 from .template import render_report_html
 from .exceptions import ReportRenderError
@@ -23,7 +23,7 @@ def _inject(html, pages):
     def repl(m):
         a = m.group(1)
         n = pages.get(a)
-        return f'<span class="toc-page" data-toc-anchor="{a}">{n if n else "ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â"}</span>'
+        return f'<span class="toc-page" data-toc-anchor="{a}">{n if n else "ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â"}</span>'
     return re.sub(
         r'<span class="toc-page" data-toc-anchor="([^"]+)">[^<]*</span>',
         repl, html,
