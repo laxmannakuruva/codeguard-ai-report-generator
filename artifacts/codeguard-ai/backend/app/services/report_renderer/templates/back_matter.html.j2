@@ -1,6 +1,6 @@
 ﻿{# APPENDICES #}
 <section class="page front" id="anchor-appendices">
-  <h1>Appendices</h1>
+  <h1>{{ ctx.chapters|length + 1 }}. Appendices</h1>
   <div class="rule"></div>
 
   <p>
@@ -30,7 +30,7 @@
 
 {# REFERENCES #}
 <section class="page front" id="anchor-references">
-  <h1>References</h1>
+  <h1>{{ ctx.chapters|length + 2 }}. References</h1>
   <div class="rule"></div>
 
   {% if ctx.references_section and ctx.references_section.blocks %}

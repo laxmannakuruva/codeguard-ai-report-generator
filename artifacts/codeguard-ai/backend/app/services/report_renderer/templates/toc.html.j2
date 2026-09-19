@@ -10,7 +10,7 @@
     <li><span class="toc-title">{{ ch.heading }}</span></li>
     {% endfor %}
 
-    <li><span class="toc-title">Appendices</span></li>
-    <li><span class="toc-title">References</span></li>
+    <li><span class="toc-title">{{ ctx.chapters|length + 1 }}. Appendices</span></li>
+    <li><span class="toc-title">{{ ctx.chapters|length + 2 }}. References</span></li>
   </ul>
 </section>
