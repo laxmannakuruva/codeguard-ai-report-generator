@@ -1,4 +1,4 @@
-﻿<section class="page cover">
+<section class="page cover">
   <div class="kicker">Internship / Project Report</div>
   <div class="on">A REPORT</div>
   <div class="on">ON</div>
@@ -6,12 +6,12 @@
   <h1 class="project-title">{{ ctx.project_name }}</h1>
 
   <div class="by">By</div>
-  <div class="student-line">Student Name</div>
-  <div class="student-line">Roll Number</div>
+  <div class="student-line">{{ ctx.student_name | default("", true) }}</div>
+  <div class="student-line">{{ ctx.roll_number  | default("", true) }}</div>
 
   <div class="submission">
     Submitted in partial fulfilment of the requirements of the internship programme.
   </div>
 
-  <div class="date">Date</div>
+  <div class="date">{{ ctx.today | default("", true) }}</div>
 </section>
