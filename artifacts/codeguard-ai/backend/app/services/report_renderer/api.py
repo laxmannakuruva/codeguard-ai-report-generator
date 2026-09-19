@@ -22,7 +22,7 @@ def _inject(html, pages):
     def repl(m):
         a = m.group(1)
         n = pages.get(a)
-        return f'<span class="toc-page" data-toc-anchor="{a}">{n if n else "â€”"}</span>'
+        return f'<span class="toc-page" data-toc-anchor="{a}">{n if n else "Ã¢â‚¬â€"}</span>'
     return re.sub(
         r'<span class="toc-page" data-toc-anchor="([^"]+)">[^<]*</span>',
         repl, html,
@@ -185,7 +185,7 @@ def generate_report_pdf(project_profile, sections, sample_pdf=None, project_root
 
     uploaded_imgs = _uploaded_to_report_images(uploaded_images)
     disk_imgs = select_project_images(project_root)
-    imgs = (uploaded_imgs + disk_imgs)[:8]
+    imgs = (uploaded_imgs if uploaded_imgs else disk_imgs)[:8]
     if imgs:
         target = None
         for ch in chapters:
