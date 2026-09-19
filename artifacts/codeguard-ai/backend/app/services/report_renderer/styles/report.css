@@ -119,3 +119,19 @@ ol, ul, li {
   content: leader('.') " " target-counter(attr(href), page);
   font-weight: 700;
 }
+
+/* Long paths must wrap, not overflow */
+li, p, td {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+pre.tree {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Optional: kill page numbers if you don't want them */
+@page {
+  @bottom-center { content: none; }
+  @bottom-right { content: none; }
+}
