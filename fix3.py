@@ -7,31 +7,26 @@ R = Path(r"D:\codeguard-ai-stage3\artifacts\codeguard-ai\backend\app\services\re
 p = R / "content.py"
 s = p.read_text(encoding="utf-8")
 
-# 1. add EMOJI_RE after the FIGURE regex
 if "EMOJI_RE" not in s:
     anchor = 'MD_FIGURE_RE = re.compile(r"^\\s*\\[FIGURE:\\s*(.+?)\\]\\s*$", re.IGNORECASE)'
     add = anchor + '\nEMOJI_RE = re.compile(\n    "["\n    "\\U0001F300-\\U0001F9FF"\n    "\\U00002600-\\U000027BF"\n    "\\U0001F000-\\U0001F0FF"\n    "\\U0001F900-\\U0001F9FF"\n    "\\u2600-\\u27BF"\n    "\\u2190-\\u21FF"\n    "\\u2B00-\\u2BFF"\n    "\\uFE00-\\uFE0F"\n    "\\u200D"\n    "]+",\n    flags=re.UNICODE,\n)'
     s = s.replace(anchor, add, 1)
 
-# 2. strip emoji inside _clean
 old = 'return re.sub(r"[ \\t]+", " ", s).strip()'
 new = 's = EMOJI_RE.sub("", s)\n    return re.sub(r"[ \\t]+", " ", s).strip()'
 if old in s and 'EMOJI_RE.sub("", s)' not in s:
     s = s.replace(old, new, 1)
 
-# 3. looser table separator regex (handles no-pipe dashes)
 old_sep = 'MD_TABLE_SEP_RE = re.compile(r"^\\s*\\|[\\s\\-:|]+\\|\\s*$")'
 new_sep = 'MD_TABLE_SEP_RE = re.compile(r"^\\s*[\\|\\s\\-:]*-{3,}[\\|\\s\\-:]*$")'
 if old_sep in s:
     s = s.replace(old_sep, new_sep, 1)
 
-# 4. track last heading so we can strip duplicates
 old_vars = '    table_rows = []'
 new_vars = '    table_rows = []\n    last_heading = [None]'
 if 'last_heading = [None]' not in s:
     s = s.replace(old_vars, new_vars, 1)
 
-# 5. strip duplicate heading in flush_paragraph
 old_flush = '''    def flush_paragraph():
         if buffer:
             joined = " ".join(l.strip() for l in buffer if l.strip())
@@ -53,13 +48,7 @@ new_flush = '''    def flush_paragraph():
 if old_flush in s:
     s = s.replace(old_flush, new_flush, 1)
 
-# 6. handle heading+content on same line, and set last_heading
-old_h2 = '''            htext = _clean(m_heading.group(1))
-            blocks.append(Block(type="h2", text=htext))
-            last_heading[0] = htext
-            continue'''
-if old_h2 not in s:
-    old_h2 = '''            blocks.append(Block(type="h2", text=_clean(m_heading.group(1))))
+old_h2 = '''            blocks.append(Block(type="h2", text=_clean(m_heading.group(1))))
             continue'''
 new_h2 = '''            raw_h = m_heading.group(1).strip()
             inline = ""
@@ -84,19 +73,12 @@ print("content.py OK")
 p = R / "ai_writer.py"
 s = p.read_text(encoding="utf-8")
 
-# stronger anti-emoji + anti-repeat in system prompt
 old_sp = '"Never use emoji or icon characters."'
 new_sp = ('"Never use emoji, pin symbols (like the pushpin icon), or any unicode icon. "\n'
           '        "Never repeat the subheading text at the start of a paragraph."')
 if old_sp in s:
     s = s.replace(old_sp, new_sp, 1)
-elif 'Never use emoji, pin symbols' not in s:
-    s = s.replace('"Never output apologies or disclaimers."',
-                  '"Never output apologies or disclaimers. "\n'
-                  '        "Never use emoji, pin symbols, or unicode icons. "\n'
-                  '        "Never repeat the subheading text at the start of a paragraph."', 1)
 
-# add rules 12 & 13 in _build_prompt
 anchor = '"   starting with \'- \'.\\n\\n"'
 add = ('"   starting with \'- \'.\\n"\n'
        '        "12. NEVER use emoji, pin symbols (like the pushpin), or unicode icons.\\n"\n'
@@ -135,9 +117,7 @@ new_css = """.chapter h2.subheading {
 }"""
 if old_css in s:
     s = s.replace(old_css, new_css, 1)
-    print("report.css OK")
-else:
-    print("report.css: pattern already clean or missing")
 
 p.write_text(s, encoding="utf-8", newline="\n")
+print("report.css OK")
 print("ALL DONE")
