@@ -1,8 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>{{ ctx.project_name }} â€” Project Report</title>
+<title>{{ ctx.project_name }} - Project Report</title>
 <style>
 {{ css_vars }}
 
@@ -13,6 +13,7 @@
 
 {% include "cover.html.j2" %}
 {% include "front_matter.html.j2" %}
+{% include "abstract.html.j2" %}
 {% include "toc.html.j2" %}
 {% include "chapter.html.j2" %}
 {% include "back_matter.html.j2" %}
@@ -20,4 +21,3 @@
 
 </body>
 </html>
-

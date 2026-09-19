@@ -199,3 +199,21 @@ figure.figure figcaption { font-size: 9.5pt; font-style: italic; margin-top: 6pt
 .gallery-item { display: block; page-break-inside: avoid; margin: 14pt 0; text-align: center; }
 .gallery-item img { max-width: 100%; max-height: 320pt; border: 0.75pt solid #333; padding: 4pt; }
 .gallery-item figcaption { font-size: 10pt; font-style: italic; margin-top: 6pt; color: #333; }
+
+
+/* Kill all page numbers */
+@page { @top-left { content: none !important; } @top-center { content: none !important; }
+        @top-right { content: none !important; } @bottom-left { content: none !important; }
+        @bottom-center { content: none !important; } @bottom-right { content: none !important; } }
+
+/* TOC plain list */
+.toc-list { list-style: none !important; padding: 0 !important; margin: 12pt 0 0 0 !important; }
+.toc-list li { display: block !important; margin: 8pt 0 !important; padding: 0 !important; }
+.toc-list .toc-title { font-weight: 600; }
+.toc-list .toc-page, .toc-list .toc-dots { display: none !important; }
+
+/* Gallery */
+.gallery { display: block; margin-top: 12pt; }
+.gallery-item { display: block; page-break-inside: avoid; margin: 14pt 0; text-align: center; }
+.gallery-item img { max-width: 100%; max-height: 340pt; border: 0.75pt solid #333; padding: 4pt; }
+.gallery-item figcaption { font-size: 10pt; font-style: italic; margin-top: 6pt; color: #333; }

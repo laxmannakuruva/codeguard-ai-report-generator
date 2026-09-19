@@ -159,6 +159,41 @@ def _flatten_folder_structure(fs):
     return sorted(set(out))
 
 
+def _shorten_paths(paths):
+    """Drop the common top-level root segment from every path."""
+    if not paths:
+        return paths
+    roots = {p.split("/")[0] for p in paths if "/" in p}
+    if len(roots) == 1:
+        root = roots.pop()
+        return ["/".join(p.split("/")[1:]) if p.startswith(root + "/") else p for p in paths]
+    return paths
+
+
+def _render_tree(paths):
+    """Turn a flat list of slash-paths into an ASCII tree string."""
+    if not paths:
+        return []
+    tree = {}
+    for p in paths:
+        cur = tree
+        for part in p.split("/"):
+            cur = cur.setdefault(part, {})
+    lines = []
+
+    def walk(node, prefix=""):
+        items = sorted(node.items())
+        for i, (name, sub) in enumerate(items):
+            last = (i == len(items) - 1)
+            conn = "└── " if last else "├── "
+            lines.append(prefix + conn + name)
+            if sub:
+                walk(sub, prefix + ("    " if last else "│   "))
+
+    walk(tree)
+    return lines
+
+
 def _join(items, sep=", "):
     items = [x for x in items if x]
     return escape(sep.join(items)) if items else DETECTED
@@ -363,7 +398,12 @@ def build_context(profile, sections):
     imp = _as_list(f.get("important_files"))
     fold = _flatten_folder_structure(f.get("folder_structure"))
 
+    eps_short = _shorten_paths(eps)
+    imp_short = _shorten_paths(imp)
+    fold_short = _shorten_paths(fold)
+
     return {
+        "folder_tree": _render_tree(fold_short),
         "project_name": escape(pn),
         "project_type": escape(pt),
         "languages": langs,
@@ -375,9 +415,9 @@ def build_context(profile, sections):
         "apis": apis,
         "modules": mods,
         "features": feats,
-        "entry_points": eps,
+        "entry_points": eps_short,
         "tests": tst,
-        "important_files": imp,
+        "important_files": imp_short,
         "folder_structure": fold,
         "languages_text": _join(langs),
         "frameworks_text": _join(fw),

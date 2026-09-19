@@ -93,7 +93,7 @@ def _facts_from_context(ctx):
 
 
 def _ai_to_chapters(ai_sections):
-    chapters, ack, refs = [], None, None
+    chapters, ack, refs, abstract = [], None, None, None
     for item in ai_sections:
         title = (item.get("title") or "").strip()
         lower = title.lower()
@@ -105,11 +105,13 @@ def _ai_to_chapters(ai_sections):
             ack = section
         elif lower == "references":
             refs = section
+        elif lower == "abstract":
+            abstract = section
         else:
             chapters.append(section)
-    for i, ch in enumerate(chapters, 1):
+    for i, ch in enumerate(chapters, 2):
         ch.heading = f"{i}. {ch.title}"
-    return chapters, ack, refs
+    return chapters, ack, refs, abstract
 
 
 def generate_report_pdf(project_profile, sections, sample_pdf=None, project_root=None, uploaded_images=None):
@@ -128,11 +130,12 @@ def generate_report_pdf(project_profile, sections, sample_pdf=None, project_root
             _facts_from_context(ctx),
             progress=lambda m: print(m, flush=True),
         )
-        chapters, ack, refs = _ai_to_chapters(ai_sections)
+        chapters, ack, refs, abstract = _ai_to_chapters(ai_sections)
         ctx["chapters"] = chapters
         ctx["acknowledgement"] = ack
         ctx["references_section"] = refs
-        print(f"[AI] {len(chapters)} chapters | ack={bool(ack)} | refs={bool(refs)}", flush=True)
+        ctx["abstract"] = abstract
+        print(f"[AI] {len(chapters)} chapters | ack={bool(ack)} | refs={bool(refs)} | abstract={bool(abstract)}", flush=True)
     except Exception as exc:
         log.warning("AI generation failed: %s", exc)
         print(f"[AI] FAILED: {exc}", flush=True)
@@ -146,12 +149,4 @@ def generate_report_pdf(project_profile, sections, sample_pdf=None, project_root
     html_pass1 = render_report_html(css_v, css_b, ctx, imgs)
     pdf_pass1 = _render_pdf(html_pass1)
 
-    page_numbers = {}
-    try:
-        page_numbers = _measure_pages_from_pdf(pdf_pass1, chapters)
-        print(f"[TOC] page numbers: {page_numbers}", flush=True)
-    except Exception as e:
-        log.warning("PDF measurement failed: %s", e)
-
-    html_pass2 = _inject(html_pass1, page_numbers)
-    return _render_pdf(html_pass2)
+    return pdf_pass1

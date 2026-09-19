@@ -3,34 +3,15 @@
   <div class="rule"></div>
 
   <ul class="toc-list">
-    <li>
-      <span class="toc-title">Acknowledgement</span>
-      <span class="toc-dots"></span>
-      <span class="toc-page" data-toc-anchor="anchor-ack">&mdash;</span>
-    </li>
+    <li><span class="toc-title">Acknowledgement</span></li>
+    <li><span class="toc-title">Abstract</span></li>
 
     {% for ch in ctx.chapters %}
-    <li>
-      <span class="toc-title">{{ ch.heading }}</span>
-      <span class="toc-dots"></span>
-      <span class="toc-page" data-toc-anchor="anchor-chapter-{{ loop.index }}">&mdash;</span>
-    </li>
+    <li><span class="toc-title">{{ ch.heading }}</span></li>
     {% endfor %}
 
-    <li>
-      <span class="toc-title">Project Image Gallery</span>
-      <span class="toc-dots"></span>
-      <span class="toc-page" data-toc-anchor="anchor-gallery">&mdash;</span>
-    </li>
-    <li>
-      <span class="toc-title">Appendices</span>
-      <span class="toc-dots"></span>
-      <span class="toc-page" data-toc-anchor="anchor-appendices">&mdash;</span>
-    </li>
-    <li>
-      <span class="toc-title">References</span>
-      <span class="toc-dots"></span>
-      <span class="toc-page" data-toc-anchor="anchor-references">&mdash;</span>
-    </li>
+    <li><span class="toc-title">Project Image Gallery</span></li>
+    <li><span class="toc-title">Appendices</span></li>
+    <li><span class="toc-title">References</span></li>
   </ul>
 </section>

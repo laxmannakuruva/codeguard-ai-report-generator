@@ -1,0 +1,14 @@
+<section class="page front" id="anchor-abstract">
+  <h1>Abstract</h1>
+  <div class="rule"></div>
+  {% if ctx.abstract and ctx.abstract.blocks %}
+    {% for block in ctx.abstract.blocks %}
+      {% if block.type == "p" %}<p>{{ block.text }}</p>
+      {% elif block.type == "ul" %}<ul>{% for item in block.items %}<li>{{ item }}</li>{% endfor %}</ul>
+      {% elif block.type == "ol" %}<ol>{% for item in block.items %}<li>{{ item }}</li>{% endfor %}</ol>
+      {% endif %}
+    {% endfor %}
+  {% else %}
+    <p class="notice">Abstract content is not available.</p>
+  {% endif %}
+</section>

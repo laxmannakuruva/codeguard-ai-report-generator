@@ -7,9 +7,9 @@
     Appendix content is limited to files and structures detected in the uploaded project archive.
   </p>
 
-  {% if ctx.folder_structure and ctx.folder_structure|length > 0 %}
+  {% if ctx.folder_tree and ctx.folder_tree|length > 0 %}
     <h2>Project folder structure</h2>
-    <pre class="tree">{% for line in ctx.folder_structure %}{{ line }}
+    <pre class="tree">{% for line in ctx.folder_tree %}{{ line }}
 {% endfor %}</pre>
   {% endif %}
 
