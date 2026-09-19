@@ -51,7 +51,7 @@ table.data { width: 100%; border-collapse: collapse; margin: 12pt 0 18pt 0; font
 table.data th, table.data td { border: 0.75pt solid #000; padding: 7pt 9pt; text-align: left; vertical-align: top; }
 table.data th { background: #f0f0f0; font-weight: 700; }
 
-figure.figure { display: none !important; }
+figure.figure { display: block !important; }
 figure.figure img { max-width: 100%; max-height: 240pt; border: 0.75pt solid #000; padding: 4pt; }
 figure.figure figcaption { font-size: 9.5pt; font-style: italic; margin-top: 6pt; }
 
@@ -70,7 +70,7 @@ pre.tree {
 }
 
 .notice { font-style: italic; color: #333; }
-/* hard overrides — last-wins */
+/* hard overrides â€” last-wins */
 .references-list,
 .references-list li,
 ol, ul, li {
