@@ -1,4 +1,4 @@
-﻿"""AI report writer — supports Ollama (local) and Groq (cloud)."""
+"""AI report writer — supports Ollama (local) and Groq (cloud)."""
 
 import json
 import os
