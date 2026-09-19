@@ -168,7 +168,10 @@ def _build_prompt(title, instruction, subset):
         "10. For the References section, put each reference on its own line, starting with\n"
         "   '1. ', '2. ', '3. ', etc.\n"
         "11. For lists of features, modules, or bullets, put each item on its own line\n"
-        "   starting with '- '.\n\n"
+        "   starting with '- '.\n"
+        "12. NEVER use emoji, pin symbols (like the pushpin), or unicode icons.\n"
+        "13. After a '## Subheading' line, do NOT repeat the subheading text\n"
+        "    at the start of the next paragraph.\n\n"
         f"FACTS FOR THIS SECTION:\n{subset}\n\n"
         f"SECTION TITLE: {title}\n"
         f"INSTRUCTIONS: {instruction}\n\n"
@@ -225,7 +228,8 @@ def _call_groq(prompt):
         "Always produce the full requested word count. "
         "Never refuse a writing task. "
         "Never output apologies or disclaimers. "
-        "Never use emoji or icon characters."
+        "Never use emoji, pin symbols (like the pushpin icon), or any unicode icon. "
+        "Never repeat the subheading text at the start of a paragraph."
     )
 
     for model_name in models_to_try:

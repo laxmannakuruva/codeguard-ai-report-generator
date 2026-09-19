@@ -23,8 +23,22 @@ MD_ITALIC_ALT_RE = re.compile(r"(?<!_)_([^_\n]+)_(?!_)")
 MD_HEADING_RE = re.compile(r"^#{1,6}\s+", re.MULTILINE)
 MD_HEADING_LINE_RE = re.compile(r"^\s*#{1,6}\s+(.+)$")
 MD_TABLE_ROW_RE = re.compile(r"^\s*\|(.+)\|\s*$")
-MD_TABLE_SEP_RE = re.compile(r"^\s*\|[\s\-:|]+\|\s*$")
+MD_TABLE_SEP_RE = re.compile(r"^\s*[\|\s\-:]*-{3,}[\|\s\-:]*$")
 MD_FIGURE_RE = re.compile(r"^\s*\[FIGURE:\s*(.+?)\]\s*$", re.IGNORECASE)
+EMOJI_RE = re.compile(
+    "["
+    "\U0001F300-\U0001F9FF"
+    "\U00002600-\U000027BF"
+    "\U0001F000-\U0001F0FF"
+    "\U0001F900-\U0001F9FF"
+    "\u2600-\u27BF"
+    "\u2190-\u21FF"
+    "\u2B00-\u2BFF"
+    "\uFE00-\uFE0F"
+    "\u200D"
+    "]+",
+    flags=re.UNICODE,
+)
 MD_CODE_RE = re.compile(r"`([^`]+)`")
 
 DETECTED = "Not detected"
@@ -52,6 +66,7 @@ def _clean(v):
         return ""
     s = CONFLICT_RE.sub("", str(v))
     s = _strip_markdown(s)
+    s = EMOJI_RE.sub("", s)
     return re.sub(r"[ \t]+", " ", s).strip()
 
 
@@ -202,6 +217,7 @@ def _parse_blocks(text):
     ol_items = []
     ul_items = []
     table_rows = []
+    last_heading = [None]
 
     def flush_table():
         nonlocal table_rows
@@ -216,9 +232,13 @@ def _parse_blocks(text):
         if buffer:
             joined = " ".join(l.strip() for l in buffer if l.strip())
             joined = _clean(joined)
+            h = last_heading[0]
+            if h and joined and joined.startswith(h):
+                joined = joined[len(h):].lstrip(":.").strip()
             if joined:
                 blocks.append(Block(type="p", text=joined))
             buffer.clear()
+            last_heading[0] = None
 
     def flush_list():
         nonlocal ol_items, ul_items
@@ -255,7 +275,18 @@ def _parse_blocks(text):
             flush_table()
             flush_paragraph()
             flush_list()
-            blocks.append(Block(type="h2", text=_clean(m_heading.group(1))))
+            raw_h = m_heading.group(1).strip()
+            inline = ""
+            if ": " in raw_h:
+                head, rest = raw_h.split(": ", 1)
+                if rest[:1].isupper() and len(head) < 90:
+                    raw_h, inline = head, rest
+            htext = _clean(raw_h)
+            if htext:
+                blocks.append(Block(type="h2", text=htext))
+                last_heading[0] = htext
+            if inline:
+                buffer.append(inline)
             continue
 
         if m_figure:

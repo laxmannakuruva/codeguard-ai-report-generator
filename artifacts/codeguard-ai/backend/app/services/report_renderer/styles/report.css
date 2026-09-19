@@ -159,12 +159,13 @@ li, p, td {
 
 /* subheadings inside chapters */
 .chapter h2.subheading {
-  font-size: 11.5pt;
+  font-size: 12pt;
   font-weight: 700;
-  margin: 14pt 0 6pt 0;
+  margin: 16pt 0 6pt 0;
   padding: 0;
   border: none;
   page-break-after: avoid;
+  color: #000;
 }
 
 /* figure placeholder */
