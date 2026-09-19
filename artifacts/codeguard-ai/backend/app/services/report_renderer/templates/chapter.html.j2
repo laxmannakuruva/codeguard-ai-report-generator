@@ -7,7 +7,7 @@
       {% if block.type == "h2" %}
         <h2 class="subheading">{{ block.text }}</h2>
       {% elif block.type == "p" %}
-        <p>{{ block.text }}</p>
+        <p>{{ block.text.lstrip("0123456789. ") if block.text[:2].strip().rstrip(".").isdigit() else block.text }}</p>
       {% elif block.type == "ol" %}
         <ol>{% for item in block.items %}<li>{{ item }}</li>{% endfor %}</ol>
       {% elif block.type == "ul" %}

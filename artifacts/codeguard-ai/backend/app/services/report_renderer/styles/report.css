@@ -333,3 +333,10 @@ h1 + p, h1 + div, h1 + h2 {
     content: none !important;
   }
 }
+
+
+/* abstract-heading-space */
+.page.front h1 {
+  display: block !important;
+  margin: 0 0 16pt 0 !important;
+}

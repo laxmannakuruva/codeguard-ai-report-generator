@@ -1,6 +1,7 @@
 """Normalize profile + sections into template context."""
 
 import ast
+import html
 import json
 import re
 from dataclasses import dataclass, field
@@ -65,6 +66,7 @@ def _clean(v):
     if v is None:
         return ""
     s = CONFLICT_RE.sub("", str(v))
+    s = html.unescape(html.unescape(html.unescape(s)))
     s = _strip_markdown(s)
     s = EMOJI_RE.sub("", s)
     return re.sub(r"[ \t]+", " ", s).strip()
