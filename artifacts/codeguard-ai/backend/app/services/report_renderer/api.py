@@ -5,7 +5,8 @@ import re
 from pathlib import Path
 
 from .design import extract_design, tokens_to_css_vars
-from .content import build_context, Section, _parse_blocks, Block, Block
+from .content import build_context, Section, _parse_blocks, Block
+from .pdf_structure import extract_structure, Block
 from .images import select_project_images, ReportImage
 from .template import render_report_html
 from .exceptions import ReportRenderError
@@ -168,9 +169,20 @@ def generate_report_pdf(project_profile, sections, sample_pdf=None, project_root
             ai_sections = _cached
         else:
             print(f"[AI] Generating sections ({_key})...", flush=True)
+            _custom = None
+            if sample_pdf:
+                try:
+                    _custom = extract_structure(sample_pdf)
+                    if _custom:
+                        print(f"[AI] Extracted {len(_custom)} headings from sample PDF", flush=True)
+                    else:
+                        print("[AI] Structure extraction returned 0 headings, using defaults", flush=True)
+                except Exception as _e:
+                    print(f"[AI] Structure extraction failed: {_e}", flush=True)
             ai_sections = ai_writer.generate_sections(
                 _facts_from_context(ctx),
                 progress=lambda m: print(m, flush=True),
+                custom_headings=_custom,
             )
             _save_cache(project_root, _key, ai_sections)
         chapters, ack, refs, abstract = _ai_to_chapters(ai_sections)
