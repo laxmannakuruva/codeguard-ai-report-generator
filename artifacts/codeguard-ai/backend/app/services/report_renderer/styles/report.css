@@ -132,7 +132,7 @@ pre.tree {
 
 /* Optional: kill page numbers if you don't want them */
 @page {
-  @bottom-center { content: none; }
+  @bottom-center { content: counter(page); font-size: 10pt; color: #333; }
   @bottom-right { content: none; }
 }
 
@@ -142,7 +142,7 @@ pre.tree {
   @top-center { content: none; }
   @top-right { content: none; }
   @bottom-left { content: none; }
-  @bottom-center { content: none; }
+  @bottom-center { content: counter(page); font-size: 10pt; color: #333; }
   @bottom-right { content: none; }
 }
 
@@ -204,7 +204,7 @@ figure.figure figcaption { font-size: 9.5pt; font-style: italic; margin-top: 6pt
 /* Kill all page numbers */
 @page { @top-left { content: none !important; } @top-center { content: none !important; }
         @top-right { content: none !important; } @bottom-left { content: none !important; }
-        @bottom-center { content: none !important; } @bottom-right { content: none !important; } }
+        @bottom-center { content: counter(page) !important; font-size: 10pt; color: #333; } @bottom-right { content: none !important; } }
 
 /* TOC plain list */
 .toc-list { list-style: none !important; padding: 0 !important; margin: 12pt 0 0 0 !important; }
