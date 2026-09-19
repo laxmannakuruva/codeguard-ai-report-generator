@@ -247,3 +247,25 @@ figure.figure figcaption { font-size: 10pt; font-style: italic; margin-top: 6pt;
 figure.figure { margin: 16pt auto; text-align: center; page-break-inside: avoid; }
 figure.figure img { max-width: 100%; max-height: 340pt; border: 0.75pt solid #333; padding: 4pt; }
 figure.figure figcaption { font-size: 10pt; font-style: italic; margin-top: 6pt; color: #333; }
+
+/* Show figures with real images (override old hide rule) */
+figure.figure {
+  display: block !important;
+  margin: 16pt auto;
+  text-align: center;
+  page-break-inside: avoid;
+}
+figure.figure img {
+  max-width: 100%;
+  max-height: 340pt;
+  border: 0.75pt solid #333;
+  padding: 4pt;
+  display: block;
+  margin: 0 auto;
+}
+figure.figure figcaption {
+  font-size: 10pt;
+  font-style: italic;
+  margin-top: 6pt;
+  color: #333;
+}
