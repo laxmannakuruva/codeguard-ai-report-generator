@@ -23,7 +23,9 @@
         </table>
       {% elif block.type == "figure" %}
         <figure class="figure">
-          <div class="figure-placeholder">[ diagram ]</div>
+          {% if block.image_uri %}
+            <img src="{{ block.image_uri }}" alt="{{ block.text }}">
+          {% endif %}
           <figcaption>{{ block.text }}</figcaption>
         </figure>
       {% endif %}
