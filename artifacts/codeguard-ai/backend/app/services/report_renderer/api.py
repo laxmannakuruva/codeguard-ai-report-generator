@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 
 from .design import extract_design, tokens_to_css_vars
-from .content import build_context, Section, _parse_blocks, Block
+from .content import build_context, Section, _parse_blocks, Block, Block
 from .images import select_project_images, ReportImage
 from .template import render_report_html
 from .exceptions import ReportRenderError
