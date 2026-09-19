@@ -269,3 +269,20 @@ figure.figure figcaption {
   margin-top: 6pt;
   color: #333;
 }
+
+/* Page numbers: bottom-center, hidden on cover page */
+@page {
+  @bottom-center {
+    content: counter(page);
+    font-size: 10pt;
+    color: #333;
+    font-family: Georgia, "Times New Roman", serif;
+    vertical-align: middle;
+    padding-bottom: 6mm;
+  }
+}
+@page :first {
+  @bottom-center {
+    content: none;
+  }
+}

@@ -22,7 +22,7 @@ def _inject(html, pages):
     def repl(m):
         a = m.group(1)
         n = pages.get(a)
-        return f'<span class="toc-page" data-toc-anchor="{a}">{n if n else "Ã¢â‚¬â€"}</span>'
+        return f'<span class="toc-page" data-toc-anchor="{a}">{n if n else "ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â"}</span>'
     return re.sub(
         r'<span class="toc-page" data-toc-anchor="([^"]+)">[^<]*</span>',
         repl, html,
