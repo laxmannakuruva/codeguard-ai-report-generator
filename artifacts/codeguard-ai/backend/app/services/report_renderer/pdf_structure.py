@@ -43,6 +43,28 @@ def _find_toc_page(lines):
     return None
 
 
+def _dedupe_titles(headings):
+    """Remove duplicate/similar titles (e.g. 'Appendices' twice)."""
+    import re as _re
+    seen_keys = set()
+    out = []
+    for h in headings:
+        t = h.get("title", "").strip()
+        # Normalize: strip leading number, lowercase, strip punctuation
+        norm = _re.sub(r"^\d+(?:\.\d+)*\.?\s*", "", t).strip().lower()
+        norm = _re.sub(r"[^a-z0-9]+", "", norm)
+        # Treat "appendix"/"appendices" as same
+        if norm in ("appendix", "appendices"):
+            norm = "appendix"
+        if norm in ("references", "reference", "bibliography"):
+            norm = "references"
+        if norm in seen_keys:
+            continue
+        seen_keys.add(norm)
+        out.append(h)
+    return out
+
+
 def extract_structure(pdf_bytes):
     """Return list of {title, depth, page} from a sample PDF. Empty list on failure."""
     try:
@@ -145,6 +167,7 @@ def extract_structure(pdf_bytes):
         output.append(c)
 
     output.sort(key=lambda c: (c["page"], c["depth"]))
+    output = _dedupe_titles(output)
     return output[:40]
 
 
