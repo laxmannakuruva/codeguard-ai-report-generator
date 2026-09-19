@@ -83,15 +83,11 @@ def extract_structure(pdf_bytes):
 
     toc_page = _find_toc_page(lines)
 
-    start_page = None
-    for l in lines:
-        if toc_page and l["page"] <= toc_page:
-            continue
-        if re.match(r"^1\.\s+[A-Z]", l["text"]) and l["size"] >= body_size + 1:
-            start_page = l["page"]
-            break
-    if start_page is None:
-        start_page = (toc_page or 2) + 1
+    # Skip cover (p1), certificate (p2), TOC page — keep everything else
+    skip_pages = {1, 2}
+    if toc_page:
+        skip_pages.add(toc_page)
+    start_page = 3
 
     stop_page = None
     for l in lines:
@@ -104,9 +100,7 @@ def extract_structure(pdf_bytes):
     max_chapter = 0
 
     for l in lines:
-        if l["page"] < start_page:
-            continue
-        if toc_page and l["page"] == toc_page:
+        if l["page"] in skip_pages:
             continue
         if stop_page and l["page"] >= stop_page:
             continue

@@ -340,3 +340,15 @@ h1 + p, h1 + div, h1 + h2 {
   display: block !important;
   margin: 0 0 16pt 0 !important;
 }
+
+
+/* TOC FINAL FIX */
+.toc-list { list-style: none !important; padding: 0 !important; margin: 12pt 0 0 0 !important; }
+.toc-list li {
+  display: block !important;
+  margin: 6pt 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  clear: both !important;
+}
+.toc-list .toc-title { display: inline !important; font-weight: 600 !important; font-size: 11.5pt !important; }

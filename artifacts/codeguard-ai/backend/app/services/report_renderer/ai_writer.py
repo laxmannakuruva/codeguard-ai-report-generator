@@ -265,6 +265,24 @@ def _specs_from_headings(headings):
     if not headings or len(headings) < 5:
         return None
     out = []
+    titles_lower = " ".join((h.get("title") or "").lower() for h in headings)
+    if "acknowledg" not in titles_lower:
+        out.append({
+            "title": "Acknowledgement",
+            "focus_keys": ["project_name"],
+            "instruction": ("Write 200-250 words of formal academic acknowledgement. "
+                            "Thank the institution, project guide, and collaborators generically. "
+                            "Warm academic tone."),
+        })
+    if "abstract" not in titles_lower:
+        out.append({
+            "title": "Abstract",
+            "focus_keys": ["project_name", "project_type", "readme_summary",
+                           "languages", "frameworks", "libraries", "features"],
+            "instruction": ("Write a formal abstract of 200-280 words. Cover what the project "
+                            "is, what problem it solves, technologies used, what it produces, "
+                            "and main outcome."),
+        })
     for h in headings:
         title = (h.get("title") or "").strip()
         # Strip leading number: "5.1 Objectives" -> "Objectives"
