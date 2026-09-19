@@ -22,7 +22,7 @@ def _inject(html, pages):
     def repl(m):
         a = m.group(1)
         n = pages.get(a)
-        return f'<span class="toc-page" data-toc-anchor="{a}">{n if n else "—"}</span>'
+        return f'<span class="toc-page" data-toc-anchor="{a}">{n if n else "â€”"}</span>'
     return re.sub(
         r'<span class="toc-page" data-toc-anchor="([^"]+)">[^<]*</span>',
         repl, html,
@@ -145,7 +145,7 @@ def _ai_to_chapters(ai_sections):
             abstract = section
         else:
             chapters.append(section)
-    for i, ch in enumerate(chapters, 2):
+    for i, ch in enumerate(chapters, 1):
         ch.heading = f"{i}. {ch.title}"
     return chapters, ack, refs, abstract
 
