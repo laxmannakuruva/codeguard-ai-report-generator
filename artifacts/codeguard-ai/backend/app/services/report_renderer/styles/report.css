@@ -51,7 +51,7 @@ table.data { width: 100%; border-collapse: collapse; margin: 12pt 0 18pt 0; font
 table.data th, table.data td { border: 0.75pt solid #000; padding: 7pt 9pt; text-align: left; vertical-align: top; }
 table.data th { background: #f0f0f0; font-weight: 700; }
 
-figure.figure { margin: 16pt auto; text-align: center; page-break-inside: avoid; }
+figure.figure { display: none !important; }
 figure.figure img { max-width: 100%; max-height: 240pt; border: 0.75pt solid #000; padding: 4pt; }
 figure.figure figcaption { font-size: 9.5pt; font-style: italic; margin-top: 6pt; }
 
@@ -159,10 +159,11 @@ li, p, td {
 
 /* subheadings inside chapters */
 .chapter h2.subheading {
-  font-size: 13pt;
-  margin: 18pt 0 8pt 0;
-  border-bottom: 0.5pt solid #999;
-  padding-bottom: 3pt;
+  font-size: 11.5pt;
+  font-weight: 700;
+  margin: 14pt 0 6pt 0;
+  padding: 0;
+  border: none;
   page-break-after: avoid;
 }
 

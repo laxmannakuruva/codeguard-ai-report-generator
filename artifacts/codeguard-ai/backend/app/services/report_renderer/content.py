@@ -238,17 +238,17 @@ def _parse_blocks(text):
 
         m_heading = MD_HEADING_LINE_RE.match(line)
         m_figure = MD_FIGURE_RE.match(line)
-        m_table_row = MD_TABLE_ROW_RE.match(line)
         m_table_sep = MD_TABLE_SEP_RE.match(line)
+        m_table_row = MD_TABLE_ROW_RE.match(line)
+
+        if m_table_sep:
+            continue
 
         if m_table_row:
             flush_paragraph()
             flush_list()
             cells = [c.strip() for c in m_table_row.group(1).split("|")]
             table_rows.append(cells)
-            continue
-
-        if m_table_sep:
             continue
 
         if m_heading:
@@ -259,10 +259,6 @@ def _parse_blocks(text):
             continue
 
         if m_figure:
-            flush_table()
-            flush_paragraph()
-            flush_list()
-            blocks.append(Block(type="figure", text=_clean(m_figure.group(1))))
             continue
 
         flush_table()
