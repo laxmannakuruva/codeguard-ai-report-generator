@@ -4,28 +4,20 @@
 
   <ul class="toc-list">
     <li>
-      <span class="toc-title">Acknowledgement</span>
-      <span class="toc-dots"></span>
-      <a class="toc-page" href="#anchor-ack"></a>
+      <a href="#anchor-ack">Acknowledgement</a>
     </li>
 
     {% for ch in ctx.chapters %}
     <li>
-      <span class="toc-title">{{ ch.heading }}</span>
-      <span class="toc-dots"></span>
-      <a class="toc-page" href="#anchor-chapter-{{ loop.index }}"></a>
+      <a href="#anchor-chapter-{{ loop.index }}">{{ ch.heading }}</a>
     </li>
     {% endfor %}
 
     <li>
-      <span class="toc-title">Appendices</span>
-      <span class="toc-dots"></span>
-      <a class="toc-page" href="#anchor-appendices"></a>
+      <a href="#anchor-appendices">Appendices</a>
     </li>
     <li>
-      <span class="toc-title">References</span>
-      <span class="toc-dots"></span>
-      <a class="toc-page" href="#anchor-references"></a>
+      <a href="#anchor-references">References</a>
     </li>
   </ul>
 </section>

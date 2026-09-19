@@ -70,3 +70,52 @@ pre.tree {
 }
 
 .notice { font-style: italic; color: #333; }
+/* hard overrides — last-wins */
+.references-list,
+.references-list li,
+ol, ul, li {
+  display: block !important;
+  width: 100%;
+}
+.references-list li::before {
+  content: counter(list-item) ". ";
+  font-weight: 700;
+}
+.references-list { counter-reset: list-item; }
+.references-list li { counter-increment: list-item; }
+
+/* --- references: force each item on its own line --- */
+.references-list,
+.references-list li {
+  display: block !important;
+  white-space: normal !important;
+  width: 100%;
+}
+.references-list { counter-reset: refcounter; padding-left: 24pt; }
+.references-list li { counter-increment: refcounter; margin: 0 0 12pt 0; }
+.references-list li::before {
+  content: counter(refcounter) ". ";
+  font-weight: 700;
+}
+
+/* ===== TOC with dot leaders (overrides previous TOC rules) ===== */
+.toc-list {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 12pt 0 0 0 !important;
+}
+.toc-list li {
+  display: block !important;
+  margin: 6pt 0 !important;
+  line-height: 1.6;
+}
+.toc-list li a {
+  display: block;
+  color: #000;
+  text-decoration: none;
+  font-weight: 600;
+}
+.toc-list li a::after {
+  content: leader('.') " " target-counter(attr(href), page);
+  font-weight: 700;
+}
