@@ -21,6 +21,10 @@ MD_BOLD_ALT_RE = re.compile(r"__([^_]+)__")
 MD_ITALIC_RE = re.compile(r"(?<!\*)\*([^*\n]+)\*(?!\*)")
 MD_ITALIC_ALT_RE = re.compile(r"(?<!_)_([^_\n]+)_(?!_)")
 MD_HEADING_RE = re.compile(r"^#{1,6}\s+", re.MULTILINE)
+MD_HEADING_LINE_RE = re.compile(r"^\s*#{1,6}\s+(.+)$")
+MD_TABLE_ROW_RE = re.compile(r"^\s*\|(.+)\|\s*$")
+MD_TABLE_SEP_RE = re.compile(r"^\s*\|[\s\-:|]+\|\s*$")
+MD_FIGURE_RE = re.compile(r"^\s*\[FIGURE:\s*(.+?)\]\s*$", re.IGNORECASE)
 MD_CODE_RE = re.compile(r"`([^`]+)`")
 
 DETECTED = "Not detected"
@@ -197,6 +201,16 @@ def _parse_blocks(text):
     buffer = []
     ol_items = []
     ul_items = []
+    table_rows = []
+
+    def flush_table():
+        nonlocal table_rows
+        if table_rows:
+            rows = [[_clean(c) for c in row] for row in table_rows]
+            rows = [r for r in rows if any(r)]
+            if rows:
+                blocks.append(Block(type="table", items=rows))
+            table_rows = []
 
     def flush_paragraph():
         if buffer:
@@ -222,6 +236,37 @@ def _parse_blocks(text):
             flush_list()
             continue
 
+        m_heading = MD_HEADING_LINE_RE.match(line)
+        m_figure = MD_FIGURE_RE.match(line)
+        m_table_row = MD_TABLE_ROW_RE.match(line)
+        m_table_sep = MD_TABLE_SEP_RE.match(line)
+
+        if m_table_row:
+            flush_paragraph()
+            flush_list()
+            cells = [c.strip() for c in m_table_row.group(1).split("|")]
+            table_rows.append(cells)
+            continue
+
+        if m_table_sep:
+            continue
+
+        if m_heading:
+            flush_table()
+            flush_paragraph()
+            flush_list()
+            blocks.append(Block(type="h2", text=_clean(m_heading.group(1))))
+            continue
+
+        if m_figure:
+            flush_table()
+            flush_paragraph()
+            flush_list()
+            blocks.append(Block(type="figure", text=_clean(m_figure.group(1))))
+            continue
+
+        flush_table()
+
         m_num = NUMBERED_LINE_RE.match(line)
         m_bul = BULLET_LINE_RE.match(line)
 
@@ -240,6 +285,7 @@ def _parse_blocks(text):
                 flush_list()
             buffer.append(line)
 
+    flush_table()
     flush_paragraph()
     flush_list()
     return blocks
