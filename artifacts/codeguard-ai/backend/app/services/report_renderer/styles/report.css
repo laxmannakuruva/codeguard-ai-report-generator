@@ -70,7 +70,7 @@ pre.tree {
 }
 
 .notice { font-style: italic; color: #333; }
-/* hard overrides — last-wins */
+/* hard overrides â€” last-wins */
 .references-list,
 .references-list li,
 ol, ul, li {
