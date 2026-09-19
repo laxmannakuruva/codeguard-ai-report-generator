@@ -38,7 +38,7 @@ const formatBytes = (bytes: number) => {
 const API_BASE = "https://codeguard-ai-report-generator.onrender.com";
 
 /* -------------------------------------------------------------- */
-/* STAGE 1 ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â project upload                                        */
+/* STAGE 1 ⬢⬝ project upload                                        */
 /* -------------------------------------------------------------- */
 
 function ProjectStage({
@@ -86,7 +86,7 @@ function ProjectStage({
         <div>
           <div className="mb-1 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[#4d907e]">
             <Upload size={12} />
-            Stage 1 ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· Project
+            Stage 1  Project
           </div>
           <h2 className="text-xl font-semibold tracking-tight text-[#0f2e2c]">
             Upload the project ZIP.
@@ -121,7 +121,7 @@ function ProjectStage({
               {file ? file.name : "Choose your project ZIP"}
             </span>
             <span className="mt-1 text-xs text-[#9aa69e]">
-              {file ? formatBytes(file.size) : "ZIP ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· Max 50 MB"}
+              {file ? formatBytes(file.size) : "ZIP  Max 50 MB"}
             </span>
           </label>
 
@@ -137,9 +137,9 @@ function ProjectStage({
               <Upload size={15} />
             )}
             {uploadProject.isPending
-              ? "UploadingÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦"
+              ? "Uploading⬦"
               : analyzeProject.isPending
-                ? "AnalyzingÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦"
+                ? "Analyzing⬦"
                 : "Analyze project"}
           </button>
         </div>
@@ -179,7 +179,7 @@ function ProjectStage({
 }
 
 /* -------------------------------------------------------------- */
-/* STAGE 2 ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â context (problem statement + images + sample)         */
+/* STAGE 2 ⬢⬝ context (problem statement + images + sample)         */
 /* -------------------------------------------------------------- */
 
 function ContextStage({ projectId }: { projectId: string }) {
@@ -290,7 +290,7 @@ function ContextStage({ projectId }: { projectId: string }) {
       <header className="border-b border-[#eef2eb] bg-[#f8fbf6] px-6 py-5">
         <div className="mb-1 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[#4d907e]">
           <Sparkles size={12} />
-          Stage 2 ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· Context
+          Stage 2  Context
         </div>
         <h2 className="text-xl font-semibold tracking-tight text-[#0f2e2c]">
           Add the details that make the report yours.
@@ -335,10 +335,8 @@ function ContextStage({ projectId }: { projectId: string }) {
             disabled={busy === "problem" || !problemText.trim()}
             className="mt-3 inline-flex items-center gap-2 rounded-lg bg-[#216e65] px-4 py-2 text-xs font-bold text-white transition-all hover:bg-[#185b54] hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {busy === "problem" ? (
+            {busy === "problem" && (
               <LoaderCircle size={13} className="animate-spin" />
-            ) : (
-              <Check size={13} />
             )}
             Save problem statement
           </button>
@@ -382,7 +380,7 @@ function ContextStage({ projectId }: { projectId: string }) {
                 : "Choose images"}
             </span>
             <span className="mt-1 text-xs text-[#9aa69e]">
-              PNG, JPG, GIF, WEBP ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· Max 8 MB each
+              PNG, JPG, GIF, WEBP  Max 8 MB each
             </span>
           </label>
           {images.length > 0 && (
@@ -405,7 +403,7 @@ function ContextStage({ projectId }: { projectId: string }) {
                     className="rounded px-1 text-[#934a39] hover:bg-[#fff4f0]"
                     aria-label={`Remove ${f.name}`}
                   >
-                    ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢
+                    ⬢
                   </button>
                 </li>
               ))}
@@ -429,10 +427,8 @@ function ContextStage({ projectId }: { projectId: string }) {
             disabled={busy === "images" || !images.length}
             className="mt-3 inline-flex items-center gap-2 rounded-lg bg-[#216e65] px-4 py-2 text-xs font-bold text-white transition-all hover:bg-[#185b54] hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {busy === "images" ? (
+            {busy === "images" && (
               <LoaderCircle size={13} className="animate-spin" />
-            ) : (
-              <Check size={13} />
             )}
             Upload images
           </button>
