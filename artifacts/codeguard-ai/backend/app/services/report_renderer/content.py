@@ -67,6 +67,8 @@ def _clean(v):
         return ""
     s = CONFLICT_RE.sub("", str(v))
     s = html.unescape(html.unescape(html.unescape(s)))
+    # ROMAN_FIX: Groq models sometimes emit "1" instead of "I"
+    s = re.sub(r"^1\s+(would|am|have|had|will|was|wish|extend|sincerely)", r"I \1", s)
     s = _strip_markdown(s)
     s = EMOJI_RE.sub("", s)
     return re.sub(r"[ \t]+", " ", s).strip()

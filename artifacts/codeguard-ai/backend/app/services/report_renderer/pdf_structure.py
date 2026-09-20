@@ -83,11 +83,20 @@ def extract_structure(pdf_bytes):
 
     toc_page = _find_toc_page(lines)
 
-    # Skip cover (p1), certificate (p2), TOC page — keep everything else
-    skip_pages = {1, 2}
+    # Find the first page where a real numbered chapter "1. X" begins
+    start_page = None
+    for l in lines:
+        if toc_page and l["page"] <= toc_page:
+            continue
+        t = l["text"].strip()
+        if re.match(r"^1\.\s+[A-Z]", t) and l["size"] >= body_size + 0.5:
+            start_page = l["page"]
+            break
+    if start_page is None:
+        start_page = (toc_page or 4) + 1
+    skip_pages = set(range(1, start_page))
     if toc_page:
         skip_pages.add(toc_page)
-    start_page = 3
 
     stop_page = None
     for l in lines:
@@ -151,6 +160,24 @@ def extract_structure(pdf_bytes):
             candidates.append({
                 "title": t, "depth": len(parts), "page": l["page"],
             })
+            continue
+
+        # REJECT titles that look like body text fragments
+        _bad_starters = ("and ", "or ", "but ", "the dean", "we would", "i would",
+                         "signature", "vice chancellor", "prof.", "dr ", "mr ", "ms ")
+        _bad_contains = ("dean of the", "signature of", "we would like", "i would like",
+                         "would like to express", "sincerely", "gratitude")
+        tl_check = t.lower().strip()
+        if any(tl_check.startswith(b) for b in _bad_starters):
+            continue
+        if any(b in tl_check for b in _bad_contains):
+            continue
+        if tl_check == "joining report":
+            continue
+        if len(t.split()) > 12:
+            continue
+        # Reject if starts lowercase
+        if t and t[0].islower():
             continue
 
         if l["bold"] and size_diff >= 1 and len(t) < 60:
