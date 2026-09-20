@@ -111,7 +111,24 @@ def extract_structure(pdf_bytes):
             start_page = l["page"]
             break
     if start_page is None:
-        start_page = (toc_page or 4) + 1
+        # No numbered chapters — try unnumbered heading detection
+        # Look for bold + larger-than-body short lines
+        _first_heading = None
+        for l in lines:
+            if toc_page and l["page"] <= toc_page:
+                continue
+            t = l["text"].strip()
+            if len(t) > 60 or len(t) < 3:
+                continue
+            if t.endswith("."):
+                continue
+            if l["bold"] and l["size"] >= body_size + 0.5:
+                _first_heading = l["page"]
+                break
+        if _first_heading:
+            start_page = _first_heading
+        else:
+            start_page = (toc_page or 4) + 1
     skip_pages = set(range(1, start_page)) | _bad_pages
     if toc_page:
         skip_pages.add(toc_page)
@@ -190,7 +207,10 @@ def extract_structure(pdf_bytes):
             continue
         if any(b in tl_check for b in _bad_contains):
             continue
-        if tl_check == "joining report":
+        if tl_check == "joining report" or tl_check.endswith("joining report"):
+            continue
+        # Reject any heading containing 'joining' or 'certificate'
+        if "joining" in tl_check or "certificate" in tl_check:
             continue
         if len(t.split()) > 12:
             continue
