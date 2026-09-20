@@ -95,3 +95,6 @@ class ProjectReport(BaseModel):
 
 class RegenerateSectionInput(BaseModel):
     content: str = Field(default="", max_length=20_000)
+
+class ChaptersInput(BaseModel):
+    chapters: list[str] = Field(default_factory=list)

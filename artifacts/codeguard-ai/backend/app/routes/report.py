@@ -3,7 +3,7 @@ import asyncio
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import Response
 
-from ..models.project import ProjectReport, RegenerateSectionInput, ReportSection
+from ..models.project import ProjectReport, RegenerateSectionInput, ReportSection, ChaptersInput
 from ..services.report_generator import build_context, generate_section, plan_sections, regenerate_section
 from ..services.report_pdf import render_report_pdf
 from .upload import PROJECTS, StoredProject
@@ -138,3 +138,42 @@ async def regenerate_report_section(
         updated if section.id == section_id else section for section in project.report.sections
     ]
     return updated
+
+@router.get("/project/{project_id}/chapters/suggest")
+async def suggest_chapters(project_id: str):
+    project = _project_or_404(project_id)
+    if not project.sample_report_bytes:
+        return {"chapters": []}
+    try:
+        from ..services.report_renderer.pdf_structure import extract_structure
+        result = extract_structure(project.sample_report_bytes)
+        return {"chapters": [c["title"] for c in result]}
+    except Exception as e:
+        print(f"[chapters/suggest] error: {e}", flush=True)
+        return {"chapters": []}
+
+
+@router.post("/project/{project_id}/chapters")
+async def save_chapters(project_id: str, payload: ChaptersInput):
+    project = _project_or_404(project_id)
+    clean = [c.strip() for c in payload.chapters if c.strip()]
+    try:
+        from pathlib import Path as _P
+        out = _P(project.root) / "_user_chapters.txt"
+        out.write_text("\n".join(clean), encoding="utf-8")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    return {"saved": len(clean)}
+
+
+@router.delete("/project/{project_id}/chapters")
+async def clear_chapters(project_id: str):
+    project = _project_or_404(project_id)
+    try:
+        from pathlib import Path as _P
+        f = _P(project.root) / "_user_chapters.txt"
+        if f.exists():
+            f.unlink()
+    except Exception:
+        pass
+    return {"cleared": True}

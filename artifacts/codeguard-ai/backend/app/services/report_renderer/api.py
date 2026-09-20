@@ -181,7 +181,20 @@ def generate_report_pdf(project_profile, sections, sample_pdf=None, project_root
         else:
             print(f"[AI] Generating sections ({_key})...", flush=True)
             _custom = None
-            if sample_pdf:
+            # User-saved chapters take priority
+            if project_root:
+                try:
+                    from pathlib import Path as _P
+                    saved = _P(project_root) / "_user_chapters.txt"
+                    if saved.exists():
+                        lines = [ln.strip() for ln in saved.read_text(encoding="utf-8").splitlines() if ln.strip()]
+                        if lines:
+                            _custom = [{"title": ln, "depth": 1} for ln in lines]
+                            print(f"[AI] Using {len(_custom)} USER-SAVED chapters", flush=True)
+                except Exception as _e:
+                    print(f"[AI] user chapters read failed: {_e}", flush=True)
+            # Otherwise extract from sample PDF
+            if not _custom and sample_pdf:
                 try:
                     _custom = extract_structure(sample_pdf)
                     if _custom:
