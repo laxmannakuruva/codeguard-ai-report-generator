@@ -98,9 +98,17 @@ def extract_structure(pdf_bytes):
 
     candidates = []
     max_chapter = 0
+    seen_appendix = False
 
     for l in lines:
+        if seen_appendix:
+            break
         if l["page"] in skip_pages:
+            continue
+        # Stop when we hit APPENDIX / APPENDICES / REFERENCES
+        _lt = l["text"].lower().strip().rstrip(":").rstrip(".")
+        if _lt in ("appendix", "appendices", "references", "bibliography"):
+            seen_appendix = True
             continue
         if stop_page and l["page"] >= stop_page:
             continue
