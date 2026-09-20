@@ -1,2 +1,3 @@
 User-agent: *
 Allow: /
+Sitemap: https://codeguard-frontend-chev.onrender.com/sitemap.xml
