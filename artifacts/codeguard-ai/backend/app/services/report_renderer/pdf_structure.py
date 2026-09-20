@@ -250,9 +250,10 @@ def extract_structure(pdf_bytes):
     output.sort(key=lambda c: (c["page"], c["depth"]))
     output = _dedupe_titles(output)
 
-    # If 3+ top-level numbered chapters exist, keep only those
+    # Only filter if subheadings FAR outnumber chapters (noise signal)
     depth1 = [c for c in output if c.get("depth") == 1]
-    if len(depth1) >= 3:
+    depth2 = [c for c in output if c.get("depth") == 2]
+    if len(depth1) >= 5 and len(depth2) > len(depth1) * 2:
         output = depth1
 
     return output[:40]
