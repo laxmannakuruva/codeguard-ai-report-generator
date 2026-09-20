@@ -81,6 +81,24 @@ def extract_structure(pdf_bytes):
         return []
     body_size = Counter(body_sizes).most_common(1)[0][0]
 
+    # --- Rule 1: cert/ack page filter ---
+    _cert_keywords = (
+        "certificate", "certify", "signature of", "signature:",
+        "gratitude", "thank you", "dean of", "vice chancellor",
+        "joining report", "we would like", "i would like",
+        "sincerely", "acknowledgement", "acknowledgment",
+    )
+    from collections import defaultdict as _dd
+    _page_text = _dd(str)
+    for _l in lines:
+        _page_text[_l["page"]] += " " + _l["text"].lower()
+    _bad_pages = set()
+    for _pg, _txt in _page_text.items():
+        _hits = sum(1 for kw in _cert_keywords if kw in _txt)
+        if _hits >= 2:
+            _bad_pages.add(_pg)
+    print(f"[pdf_structure] cert/ack pages skipped: {sorted(_bad_pages)}", flush=True)
+
     toc_page = _find_toc_page(lines)
 
     # Find the first page where a real numbered chapter "1. X" begins
@@ -94,7 +112,7 @@ def extract_structure(pdf_bytes):
             break
     if start_page is None:
         start_page = (toc_page or 4) + 1
-    skip_pages = set(range(1, start_page))
+    skip_pages = set(range(1, start_page)) | _bad_pages
     if toc_page:
         skip_pages.add(toc_page)
 
