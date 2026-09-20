@@ -1,5 +1,5 @@
 import {
-  ListChecks, useState } from "react";
+  List, useState } from "react";
 
 import WelcomeOverlay from "@/components/welcome-overlay";
 import { useLiquidCursor } from "@/hooks/use-liquid-cursor";
@@ -39,7 +39,7 @@ const formatBytes = (bytes: number) => {
 const API_BASE = "https://codeguard-ai-report-generator.onrender.com";
 
 /* -------------------------------------------------------------- */
-/* STAGE 1 ⬢⬝ project upload                                        */
+/* STAGE 1 â¬¢â¬ project upload                                        */
 /* -------------------------------------------------------------- */
 
 function ProjectStage({
@@ -138,9 +138,9 @@ function ProjectStage({
               <Upload size={15} />
             )}
             {uploadProject.isPending
-              ? "Uploading⬦"
+              ? "Uploadingâ¬¦"
               : analyzeProject.isPending
-                ? "Analyzing⬦"
+                ? "Analyzingâ¬¦"
                 : "Analyze project"}
           </button>
         </div>
@@ -180,7 +180,7 @@ function ProjectStage({
 }
 
 /* -------------------------------------------------------------- */
-/* STAGE 2 ⬢⬝ context (problem statement + images + sample)         */
+/* STAGE 2 â¬¢â¬ context (problem statement + images + sample)         */
 /* -------------------------------------------------------------- */
 
 function ContextStage({ projectId }: { projectId: string }) {
@@ -438,7 +438,7 @@ function ContextStage({ projectId }: { projectId: string }) {
                     className="rounded px-1 text-[#934a39] hover:bg-[#fff4f0]"
                     aria-label={`Remove ${f.name}`}
                   >
-                    ⬢
+                    â¬¢
                   </button>
                 </li>
               ))}
@@ -475,7 +475,7 @@ function ContextStage({ projectId }: { projectId: string }) {
         <div className="border-t border-[#eef2eb] p-6">
           <div className="mb-2 flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs font-bold text-[#41605e]">
-              <ListChecks size={14} className="text-[#4ca189]" />
+              <List size={14} className="text-[#4ca189]" />
               Report chapters
             </div>
             {chaptersSaved && (
@@ -485,7 +485,7 @@ function ContextStage({ projectId }: { projectId: string }) {
             )}
           </div>
           <p className="mb-3 text-xs leading-5 text-[#87918a]">
-            We detected these from your sample. Edit, remove, or add freely — the report uses this exact list.
+            We detected these from your sample. Edit, remove, or add freely â€” the report uses this exact list.
           </p>
           {loadingChapters ? (
             <div className="flex items-center gap-2 text-xs text-[#41605e]">
@@ -513,7 +513,7 @@ function ContextStage({ projectId }: { projectId: string }) {
                     }}
                     className="rounded px-2 py-1 text-xs font-bold text-[#934a39] hover:bg-[#fff4f0]"
                   >
-                    ✕
+                    âœ•
                   </button>
                 </div>
               ))}
