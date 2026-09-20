@@ -1,5 +1,4 @@
-import {
-  List, useState } from "react";
+import { useState } from "react";
 
 import WelcomeOverlay from "@/components/welcome-overlay";
 import { useLiquidCursor } from "@/hooks/use-liquid-cursor";
@@ -8,6 +7,7 @@ import { useReveal } from "@/hooks/use-reveal";
 import {
   AlertCircle,
   Check,
+  List,
   FileArchive,
   FileImage,
   FileText,
