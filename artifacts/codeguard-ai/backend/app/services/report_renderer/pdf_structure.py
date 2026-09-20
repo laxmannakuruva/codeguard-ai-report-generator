@@ -163,6 +163,15 @@ def extract_structure(pdf_bytes):
         t = l["text"]
         tl = t.lower().strip()
 
+        # === UNIVERSAL file-path + depth filter ===
+        if any(ext in tl for ext in (".mp4", ".py", ".js", ".ts", ".pdf", ".docx", ".zip", ".csv", ".json", ".html", ".css", ".ipynb", ".png", ".jpg", ".mov", ".avi")):
+            continue
+        if t.count("/") >= 2:
+            continue
+        if "/refs/" in tl or "/heads/" in tl or "refs/heads" in tl:
+            continue
+        # === END filter ===
+
         if len(t) > 90:
             continue
         if t.endswith(".") and not t.endswith(":"):
@@ -192,6 +201,8 @@ def extract_structure(pdf_bytes):
                     continue
                 max_chapter = max(max_chapter, top)
 
+            if len(parts) > 2:
+                continue
             candidates.append({
                 "title": t, "depth": len(parts), "page": l["page"],
             })
