@@ -265,15 +265,6 @@ def _specs_from_headings(headings):
     if not headings or len(headings) < 5:
         return None
 
-    # Tech keywords that AI often hallucinates but projects may not use
-    HALLUCINATION_PRONE = {
-        "flask", "django", "mysql", "mongodb", "mongoose",
-        "machine learning model", "random forest", "k-nearest", "knn",
-        "xgboost", "decision tree", "deep learning", "neural network",
-        "tensorflow", "pytorch", "keras", "scikit-learn",
-        "predictive analytics", "prediction output",
-        "data preprocessing", "exploratory data analysis",
-    }
     out = []
     titles_lower = " ".join((h.get("title") or "").lower() for h in headings)
     if "acknowledg" not in titles_lower:
@@ -301,17 +292,16 @@ def _specs_from_headings(headings):
         if not clean:
             clean = title
 
-        # Skip hallucination-prone chapters if not in facts
+        # Unconditionally skip ML/Flask chapters (tool is for code projects)
+        BLACKLIST = (
+            "flask backend", "flask web application", "machine learning model",
+            "random forest", "decision tree", "k-nearest", "knn",
+            "xgboost", "prediction output", "dataset description",
+            "data preprocessing", "exploratory data analysis",
+            "model evaluation", "model development",
+        )
         clean_lower = clean.lower()
-        skip = False
-        for bad in HALLUCINATION_PRONE:
-            if bad in clean_lower:
-                # Check if the tech is actually in the project facts
-                facts_str = str(facts).lower() if facts else ""
-                if bad not in facts_str:
-                    skip = True
-                    break
-        if skip:
+        if any(b in clean_lower for b in BLACKLIST):
             continue
 
         out.append({
