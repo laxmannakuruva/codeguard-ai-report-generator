@@ -63,23 +63,17 @@ def _strip_markdown(s):
 
 
 def _clean(v):
-    """FORCE_UNESCAPE: always triple-unescape HTML entities."""
     if v is None:
         return ""
     s = CONFLICT_RE.sub("", str(v))
     s = html.unescape(html.unescape(html.unescape(s)))
-    # CODE_STRIP: kill python/js code blocks that leaked into content
-    import re as _re
-    s = _re.sub(r'\"\"\"[\s\S]{0,2000}?\"\"\"', '', s)
-    s = _re.sub(r'\b(import|from|def|class)\s+\w+[\s\S]{0,500}', '', s)
-    # Cap paragraph length at 1500 chars
-    if len(s) > 1500:
-        s = s[:1500].rsplit(' ', 1)[0] + '...'
-    # ROMAN_FIX: Groq models sometimes emit "1" instead of "I"
-    s = re.sub(r"^1\s+(would|am|have|had|will|was|wish|extend|sincerely)", r"I \1", s)
     s = _strip_markdown(s)
     s = EMOJI_RE.sub("", s)
-    return re.sub(r"[ \t]+", " ", s).strip()
+    s = re.sub(r"[ \t]+", " ", s).strip()
+    # Code-strip: cap length so raw code never floods the report
+    if len(s) > 1500:
+        s = s[:1500].rsplit(" ", 1)[0] + "..."
+    return s
 
 
 def _read_profile(p):
