@@ -485,7 +485,7 @@ function ContextStage({ projectId }: { projectId: string }) {
             )}
           </div>
           <p className="mb-3 text-xs leading-5 text-[#87918a]">
-            We detected these from your sample. Edit, remove, or add freely â€” the report uses this exact list.
+            We detected these from your sample. Edit, remove, or add freely - the report uses this exact list.
           </p>
           {loadingChapters ? (
             <div className="flex items-center gap-2 text-xs text-[#41605e]">
@@ -513,7 +513,7 @@ function ContextStage({ projectId }: { projectId: string }) {
                     }}
                     className="rounded px-2 py-1 text-xs font-bold text-[#934a39] hover:bg-[#fff4f0]"
                   >
-                    âœ•
+                    x
                   </button>
                 </div>
               ))}
