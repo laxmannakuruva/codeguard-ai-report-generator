@@ -39,7 +39,7 @@ const formatBytes = (bytes: number) => {
 const API_BASE = "https://codeguard-ai-report-generator.onrender.com";
 
 /* -------------------------------------------------------------- */
-/* STAGE 1 â¬¢â¬ project upload                                        */
+/* STAGE 1  ·  project upload                                        */
 /* -------------------------------------------------------------- */
 
 function ProjectStage({
@@ -138,9 +138,9 @@ function ProjectStage({
               <Upload size={15} />
             )}
             {uploadProject.isPending
-              ? "Uploadingâ¬¦"
+              ? "Uploading..."
               : analyzeProject.isPending
-                ? "Analyzingâ¬¦"
+                ? "Analyzing..."
                 : "Analyze project"}
           </button>
         </div>
@@ -180,7 +180,7 @@ function ProjectStage({
 }
 
 /* -------------------------------------------------------------- */
-/* STAGE 2 â¬¢â¬ context (problem statement + images + sample)         */
+/* STAGE 2  ·  context (problem statement + images + sample)         */
 /* -------------------------------------------------------------- */
 
 function ContextStage({ projectId }: { projectId: string }) {
@@ -438,7 +438,7 @@ function ContextStage({ projectId }: { projectId: string }) {
                     className="rounded px-1 text-[#934a39] hover:bg-[#fff4f0]"
                     aria-label={`Remove ${f.name}`}
                   >
-                    â¬¢
+                     · 
                   </button>
                 </li>
               ))}
