@@ -219,6 +219,7 @@ class Section:
     paragraphs: list = field(default_factory=list)
     blocks: list = field(default_factory=list)
     heading: str = None
+    level: int = 1
 
 
 def _pre_split_inline_numbers(text):

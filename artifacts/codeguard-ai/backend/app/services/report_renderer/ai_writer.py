@@ -287,7 +287,9 @@ def _specs_from_headings(headings):
     for h in headings:
         title = (h.get("title") or "").strip()
         import re as _re
-        # Strip ANY leading number (1., 5.1, 5.1.1) — renumber sequentially later
+        # Detect subheading: number like 5.1 or 5.1.1
+        is_sub = bool(_re.match(r"^\d+\.\d+", title))
+        # Strip ANY leading number
         clean = _re.sub(r"^\d+(?:\.\d+)*\.?\s*", "", title).strip()
         if not clean:
             clean = title
@@ -306,6 +308,7 @@ def _specs_from_headings(headings):
 
         out.append({
             "title": clean,
+            "level": 2 if is_sub else 1,
             "focus_keys": ["project_name", "project_type", "readme_summary",
                            "languages", "frameworks", "libraries",
                            "frontend", "backend", "database",
@@ -353,7 +356,7 @@ def generate_sections(facts, progress=None, custom_headings=None):
         if not content:
             content = "[AI returned empty content]"
         content = _roman_fix(content)
-        out.append({"title": title, "content": content})
+        out.append({"title": title, "content": content, "level": spec.get("level", 1)})
         if progress:
             progress(f"    -> {len(content)} chars")
     return out

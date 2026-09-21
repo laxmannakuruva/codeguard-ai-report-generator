@@ -135,7 +135,14 @@ def _ai_to_chapters(ai_sections):
         title = (item.get("title") or "").strip()
         lower = title.lower()
         content = item.get("content", "")
+        level = item.get("level", 1)
         blocks = _parse_blocks(content)
+        # Subheading: attach to previous chapter as h2 block + content
+        if level == 2 and chapters:
+            parent = chapters[-1]
+            parent.blocks.append(Block(type="h2", text=title))
+            parent.blocks.extend(blocks)
+            continue
         # APPLY_CLEAN_TO_BLOCKS: force unescape one more time on all text
         from .content import _clean as _clean_fn
         for _b in blocks:
