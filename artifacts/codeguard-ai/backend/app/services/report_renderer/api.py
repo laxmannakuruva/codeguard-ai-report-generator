@@ -136,6 +136,13 @@ def _ai_to_chapters(ai_sections):
         lower = title.lower()
         content = item.get("content", "")
         blocks = _parse_blocks(content)
+        # APPLY_CLEAN_TO_BLOCKS: force unescape one more time on all text
+        from .content import _clean as _clean_fn
+        for _b in blocks:
+            if _b.text:
+                _b.text = _clean_fn(_b.text)
+            if _b.items:
+                _b.items = [_clean_fn(i) for i in _b.items]
         paragraphs = [b.text for b in blocks if b.type == "p"]
         section = Section(title=title, paragraphs=paragraphs, blocks=blocks)
         # Normalize title for matching

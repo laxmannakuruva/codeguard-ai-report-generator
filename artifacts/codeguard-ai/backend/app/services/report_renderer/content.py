@@ -63,6 +63,7 @@ def _strip_markdown(s):
 
 
 def _clean(v):
+    """FORCE_UNESCAPE: always triple-unescape HTML entities."""
     if v is None:
         return ""
     s = CONFLICT_RE.sub("", str(v))

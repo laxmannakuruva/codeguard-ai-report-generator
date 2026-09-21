@@ -287,13 +287,10 @@ def _specs_from_headings(headings):
     for h in headings:
         title = (h.get("title") or "").strip()
         import re as _re
-        # If it is a subheading (5.1, 5.2), keep the full title as-is
-        if _re.match(r"^\d+\.\d+", title):
+        # Strip ANY leading number (1., 5.1, 5.1.1) — renumber sequentially later
+        clean = _re.sub(r"^\d+(?:\.\d+)*\.?\s*", "", title).strip()
+        if not clean:
             clean = title
-        else:
-            clean = _re.sub(r"^\d+\.?\s+", "", title).strip()
-            if not clean:
-                clean = title
 
         # Unconditionally skip ML/Flask chapters (tool is for code projects)
         BLACKLIST = (
@@ -325,6 +322,16 @@ def _specs_from_headings(headings):
     return out
 
 
+def _roman_fix(text):
+    """ROMAN_FIX_APPLY: fix '1 would like' -> 'I would like'."""
+    import re as _re
+    # After sentence break or start
+    text = _re.sub(r"(^|[.!?]\s+)1\s+(would|am|have|had|will|was|wish|extend|express|sincerely|thank|acknowledge)", r"\1I \2", text)
+    # Anywhere else: " 1 " at start of a word followed by verb
+    text = _re.sub(r"\b1\s+(would|am|have|had|wish|extend|express|acknowledge)", r"I \1", text)
+    return text
+
+
 def generate_sections(facts, progress=None, custom_headings=None):
     specs_to_use = _specs_from_headings(custom_headings) if custom_headings else None
     if not specs_to_use:
@@ -345,6 +352,7 @@ def generate_sections(facts, progress=None, custom_headings=None):
             content = f"[AI generation failed: {exc}]"
         if not content:
             content = "[AI returned empty content]"
+        content = _roman_fix(content)
         out.append({"title": title, "content": content})
         if progress:
             progress(f"    -> {len(content)} chars")
