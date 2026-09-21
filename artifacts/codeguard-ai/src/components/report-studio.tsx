@@ -44,6 +44,7 @@ export default function ReportStudio({
   projectId: string | null;
 }) {
   const [sections, setSections] = useState<ReportSection[]>([]);
+  const [downloadState, setDownloadState] = useState<"idle" | "loading" | "done">("idle");
   const [error, setError] = useState<string | null>(null);
   const [regeneratingId, setRegeneratingId] = useState<string | null>(null);
 
