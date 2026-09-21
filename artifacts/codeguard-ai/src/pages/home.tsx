@@ -196,6 +196,7 @@ function ContextStage({ projectId }: { projectId: string }) {
   const uploadSample = useUploadSampleReport();
 
   const [problemText, setProblemText] = useState("");
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [problemSaved, setProblemSaved] = useState(false);
   const [images, setImages] = useState<File[]>([]);
   const [imagesSaved, setImagesSaved] = useState(false);

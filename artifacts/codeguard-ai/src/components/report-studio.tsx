@@ -231,6 +231,9 @@ export default function ReportStudio({
             <div className="mb-4 flex items-center justify-between gap-3">
               <p className="text-xs font-semibold text-[#58766e]">
                 Report ready as editable text and PDF.
+                <span className="ml-2 text-[#9aa69e] font-normal">
+                  (First download takes ~30 sec — cached after that)
+                </span>
               </p>
               <button
                 type="button"
