@@ -286,11 +286,14 @@ def _specs_from_headings(headings):
         })
     for h in headings:
         title = (h.get("title") or "").strip()
-        # Strip leading number: "5.1 Objectives" -> "Objectives"
         import re as _re
-        clean = _re.sub(r"^\d+(?:\.\d+)*\.?\s*", "", title).strip()
-        if not clean:
+        # If it is a subheading (5.1, 5.2), keep the full title as-is
+        if _re.match(r"^\d+\.\d+", title):
             clean = title
+        else:
+            clean = _re.sub(r"^\d+\.?\s+", "", title).strip()
+            if not clean:
+                clean = title
 
         # Unconditionally skip ML/Flask chapters (tool is for code projects)
         BLACKLIST = (

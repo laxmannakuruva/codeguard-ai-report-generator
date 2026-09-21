@@ -1,4 +1,5 @@
-﻿{# APPENDICES #}
+{% if ctx.has_appendices %}
+{# APPENDICES #}
 <section class="page front" id="anchor-appendices">
   <h1>{{ ctx.chapters|length + 1 }}. Appendices</h1>
   <div class="rule"></div>
@@ -27,6 +28,8 @@
     </table>
   {% endif %}
 </section>
+
+{% endif %}
 
 {# REFERENCES #}
 <section class="page front" id="anchor-references">

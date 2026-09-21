@@ -157,8 +157,12 @@ def _ai_to_chapters(ai_sections):
             pass
         else:
             chapters.append(section)
+    import re as _renum
     for i, ch in enumerate(chapters, 1):
-        ch.heading = f"{i}. {ch.title}"
+        if _renum.match(r"^\d+", ch.title):
+            ch.heading = ch.title
+        else:
+            ch.heading = f"{i}. {ch.title}"
     return chapters, ack, refs, abstract
 
 
@@ -203,6 +207,16 @@ def generate_report_pdf(project_profile, sections, sample_pdf=None, project_root
                         print("[AI] Structure extraction returned 0 headings, using defaults", flush=True)
                 except Exception as _e:
                     print(f"[AI] Structure extraction failed: {_e}", flush=True)
+
+            _has_appendices = False
+            if _custom:
+                for _h in _custom:
+                    _t = (_h.get("title") or "").lower()
+                    if "appendic" in _t:
+                        _has_appendices = True
+                        break
+            ctx["has_appendices"] = _has_appendices
+            print(f"[AI] sample has appendices: {_has_appendices}", flush=True)
             ai_sections = ai_writer.generate_sections(
                 _facts_from_context(ctx),
                 progress=lambda m: print(m, flush=True),
