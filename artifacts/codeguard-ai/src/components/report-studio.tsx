@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   AlertCircle,
   Download,
+  Check,
   FileText,
   LoaderCircle,
   RefreshCw,
@@ -231,15 +232,51 @@ export default function ReportStudio({
               <p className="text-xs font-semibold text-[#58766e]">
                 Report ready as editable text and PDF.
               </p>
-              <a
-                href={`${API_BASE}/api/project/${projectId}/report.pdf`}
-                download="project-report.pdf"
-                className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-[#216e65] px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-[#185b54]"
+              <button
+                type="button"
+                onClick={async () => {
+                  setDownloadState("loading");
+                  try {
+                    const r = await fetch(`${API_BASE}/api/project/${projectId}/report.pdf`);
+                    if (!r.ok) throw new Error("download failed");
+                    const blob = await r.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = "project-report.pdf";
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    URL.revokeObjectURL(url);
+                    setDownloadState("done");
+                    setTimeout(() => setDownloadState("idle"), 3000);
+                  } catch {
+                    setDownloadState("idle");
+                  }
+                }}
+                disabled={downloadState === "loading"}
+                className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-[#216e65] px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-[#185b54] disabled:opacity-70"
                 data-testid="button-download-report-pdf"
               >
-                <Download size={14} />
-                Download PDF
-              </a>
+                {downloadState === "loading" && (
+                  <>
+                    <LoaderCircle size={14} className="animate-spin" />
+                    Downloading...
+                  </>
+                )}
+                {downloadState === "done" && (
+                  <>
+                    <Check size={14} />
+                    Downloaded
+                  </>
+                )}
+                {downloadState === "idle" && (
+                  <>
+                    <Download size={14} />
+                    Download PDF
+                  </>
+                )}
+              </button>
             </div>
             <div
               className="space-y-4"
