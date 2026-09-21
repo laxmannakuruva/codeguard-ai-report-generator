@@ -1,37 +1,22 @@
-{% if ctx.has_appendices %}
-{# APPENDICES #}
-<section class="page front" id="anchor-appendices">
-  <h1>{{ ctx.chapters|length + 1 }}. Appendices</h1>
-  <div class="rule"></div>
+from pathlib import Path
 
-  <p>
-    Appendix content is limited to files and structures detected in the uploaded project archive.
-  </p>
+p = Path(r"D:\codeguard-ai-stage3\artifacts\codeguard-ai\backend\app\services\report_renderer\templates\back_matter.html.j2")
+s = p.read_text(encoding="utf-8").lstrip("\ufeff")
 
-  {% if ctx.folder_tree and ctx.folder_tree|length > 0 %}
-    <h2>Project folder structure</h2>
-    <pre class="tree">{% for line in ctx.folder_tree %}{{ line }}
-{% endfor %}</pre>
-  {% endif %}
+# Replace the References section with auto-generation
+import re
 
-  {% if ctx.important_files and ctx.important_files|length > 0 %}
-    <h2>Important files detected</h2>
-    <table class="data">
-      <thead>
-        <tr><th style="width:8%;">#</th><th>File path</th></tr>
-      </thead>
-      <tbody>
-        {% for f in ctx.important_files %}
-          <tr><td>{{ loop.index }}</td><td>{{ f }}</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% endif %}
-</section>
+# Find the References section
+start = s.find("{# REFERENCES #}")
+if start == -1:
+    start = s.find("anchor-references")
 
-{% endif %}
-
-{# REFERENCES #}
+if start > 0:
+    # Find the section end
+    end = s.find("</section>", start)
+    if end > 0:
+        end += len("</section>")
+        new_refs = '''{# REFERENCES #}
 <section class="page front" id="anchor-references">
   <h1>{{ ctx.chapters|length + (2 if ctx.has_appendices else 1) }}. References</h1>
   <div class="rule"></div>
@@ -63,4 +48,13 @@
       {% endfor %}
     </ol>
   {% endif %}
-</section>
+</section>'''
+        s = s[:start] + new_refs + s[end:]
+        print("references section replaced")
+    else:
+        print("could not find section end")
+else:
+    print("could not find references marker")
+
+p.write_text(s, encoding="utf-8", newline="\n")
+print("saved")
