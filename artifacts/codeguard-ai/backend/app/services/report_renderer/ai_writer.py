@@ -264,6 +264,16 @@ def _specs_from_headings(headings):
     """Build SECTION_SPECS-like list from extracted headings."""
     if not headings or len(headings) < 5:
         return None
+
+    # Tech keywords that AI often hallucinates but projects may not use
+    HALLUCINATION_PRONE = {
+        "flask", "django", "mysql", "mongodb", "mongoose",
+        "machine learning model", "random forest", "k-nearest", "knn",
+        "xgboost", "decision tree", "deep learning", "neural network",
+        "tensorflow", "pytorch", "keras", "scikit-learn",
+        "predictive analytics", "prediction output",
+        "data preprocessing", "exploratory data analysis",
+    }
     out = []
     titles_lower = " ".join((h.get("title") or "").lower() for h in headings)
     if "acknowledg" not in titles_lower:
@@ -290,6 +300,20 @@ def _specs_from_headings(headings):
         clean = _re.sub(r"^\d+(?:\.\d+)*\.?\s*", "", title).strip()
         if not clean:
             clean = title
+
+        # Skip hallucination-prone chapters if not in facts
+        clean_lower = clean.lower()
+        skip = False
+        for bad in HALLUCINATION_PRONE:
+            if bad in clean_lower:
+                # Check if the tech is actually in the project facts
+                facts_str = str(facts).lower() if facts else ""
+                if bad not in facts_str:
+                    skip = True
+                    break
+        if skip:
+            continue
+
         out.append({
             "title": clean,
             "focus_keys": ["project_name", "project_type", "readme_summary",
