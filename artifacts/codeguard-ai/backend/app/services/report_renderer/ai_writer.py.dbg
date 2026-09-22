@@ -356,7 +356,6 @@ def generate_sections(facts, progress=None, custom_headings=None):
         if not content:
             content = "[AI returned empty content]"
         content = _roman_fix(content)
-        print(f"[DBG-RAW] {title} :: {content[:1800]!r}", flush=True)
         out.append({"title": title, "content": content, "level": spec.get("level", 1)})
         if progress:
             progress(f"    -> {len(content)} chars")
