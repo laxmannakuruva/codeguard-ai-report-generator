@@ -271,11 +271,6 @@ def generate_report_pdf(project_profile, sections, sample_pdf=None, project_root
     css_b = _css_body()
 
     html_pass1 = render_report_html(css_v, css_b, ctx, imgs)
-    _nfig = html_pass1.count("<figure")
-    print(f"[DBG] HTML has {_nfig} <figure> tags, len={len(html_pass1)}", flush=True)
-    _i = html_pass1.find("<figure")
-    if _i >= 0:
-        print(f"[DBG] first: {html_pass1[_i:_i+300]!r}", flush=True)
     pdf_pass1 = _render_pdf(html_pass1)
 
     return pdf_pass1
